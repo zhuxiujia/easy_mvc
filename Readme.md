@@ -1,0 +1,1 @@
+GO mvc框架，支持IOC,AOP,DI 基于golang标准库和Tag机制实现.免生成中间代码，非常容易使用
