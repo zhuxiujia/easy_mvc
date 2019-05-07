@@ -13,7 +13,7 @@ import (
 )
 
 type HttpChan struct {
-	Func func(w http.ResponseWriter, r *http.Request) error
+	Func func(w http.ResponseWriter, r *http.Request) error //函数返回error则中断执行
 	Name string
 }
 
@@ -43,6 +43,8 @@ var GlobalErrorHandle = func(w http.ResponseWriter, r *http.Request) {
 func RegisterGlobalErrorHandleChan(handle *HttpErrorHandle) {
 	GlobalErrorHandleChan = append(GlobalErrorHandleChan, handle)
 }
+
+//注册http调用链/过滤器
 func RegisterGlobalHttpChan(handle *HttpChan) {
 	GlobalHttpChan = append(GlobalHttpChan, handle)
 }
