@@ -22,7 +22,9 @@ type TestController struct {
 
 func (it TestController) New() TestController {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
-		panic("sdfa")
+		if *age == 2 {
+			panic("sdfa") //测试为2时 抛出异常
+		}
 		return phone + pwd + strconv.Itoa(*age)
 	}
 	it.UserInfo = func() interface{} {
@@ -36,9 +38,14 @@ func (it TestController) New() TestController {
 }
 
 func TestController_Init(t *testing.T) {
-
-	GlobalErrorHandleChan = append(GlobalErrorHandleChan, func(err interface{}) {
-		println(err.(error).Error())
+	RegisterGlobalErrorHandleChan(&HttpErrorHandle{
+		Func: func(err interface{}, w http.ResponseWriter, r *http.Request) {
+			if err != nil {
+				println(err.(error).Error())
+				w.Write([]byte(err.(error).Error()))
+			}
+		},
+		Name: "custom",
 	})
 
 	TestController{}.New()

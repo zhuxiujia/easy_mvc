@@ -12,27 +12,66 @@ import (
 	"time"
 )
 
+type HttpChan struct {
+	Func func(w http.ResponseWriter, r *http.Request) error
+	Name string
+}
+
+type HttpErrorHandle struct {
+	Func func(err interface{}, w http.ResponseWriter, r *http.Request)
+	Name string
+}
+
 //全局http调用链，过滤器,return error 不为nil则不继续执行
-var GlobalHttpChan = []func(w http.ResponseWriter, r *http.Request) error{}
+var GlobalHttpChan = []*HttpChan{}
 
 //全局错误调用链
-var GlobalErrorHandleChan = []func(err interface{}){}
+var GlobalErrorHandleChan = []*HttpErrorHandle{}
 
 //全局错误处理器
-var GlobalErrorHandle = func() {
+var GlobalErrorHandle = func(w http.ResponseWriter, r *http.Request) {
 	// 发生宕机时，获取panic传递的上下文并打印
 	err := recover()
-	switch err.(type) {
-	case runtime.Error: // 运行时错误
-		log.Println("runtime error:", err)
-	default: // 非运行时错误
-		log.Println("error:", err)
-	}
 	for _, itemFunc := range GlobalErrorHandleChan {
 		if itemFunc != nil {
-			itemFunc(err)
+			itemFunc.Func(err, w, r)
 		}
 	}
+}
+
+//注册全局错误
+func RegisterGlobalErrorHandleChan(handle *HttpErrorHandle) {
+	GlobalErrorHandleChan = append(GlobalErrorHandleChan, handle)
+}
+func RegisterGlobalHttpChan(handle *HttpChan) {
+	GlobalHttpChan = append(GlobalHttpChan, handle)
+}
+
+func init() {
+	var defHttpHandle = HttpChan{
+		Func: func(w http.ResponseWriter, r *http.Request) error {
+			w.Header().Set("Content-type", "application/json")
+			return nil
+		},
+		Name: "DefHttpHandle",
+	}
+	GlobalHttpChan = append(GlobalHttpChan, &defHttpHandle)
+
+	var defHttpErrorHandle = HttpErrorHandle{
+		Func: func(err interface{}, w http.ResponseWriter, r *http.Request) {
+			if err != nil {
+				switch err.(type) {
+				case runtime.Error: // 运行时错误
+					log.Println("runtime error:", err)
+				default: // 非运行时错误
+					log.Println("error:", err)
+				}
+			}
+		},
+		Name: "DefHttpErrorHandle",
+	}
+
+	GlobalErrorHandleChan = append(GlobalErrorHandleChan, &defHttpErrorHandle)
 }
 
 type Controller struct {
@@ -73,11 +112,10 @@ func (it *Controller) Init(arg interface{}) {
 		}
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
-
-			defer GlobalErrorHandle()
+			defer GlobalErrorHandle(w, r)
 			//chan
 			for _, v := range GlobalHttpChan {
-				var e = v(w, r)
+				var e = v.Func(w, r)
 				if e != nil {
 					return
 				}
@@ -115,9 +153,14 @@ func (it *Controller) Init(arg interface{}) {
 				}
 			}
 			var results = field.Call(args)
+			var contentType = w.Header().Get("Content-type")
 			if results != nil && len(results) > 0 {
-				var b, _ = json.Marshal(results[0].Interface())
-				w.Write(b)
+				switch contentType {
+				case "application/json":
+					var b, _ = json.Marshal(results[0].Interface())
+					w.Write(b)
+					break
+				}
 			}
 		}
 		log.Println("[easy_mvc] http Handle " + funcField.Name + " " + funcField.Type.String() + string(" "+funcField.Tag))
