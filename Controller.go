@@ -13,7 +13,7 @@ import (
 )
 
 type HttpChan struct {
-	Func func(w http.ResponseWriter, r *http.Request) error //函数返回error则中断执行
+	Func func(w http.ResponseWriter, r *http.Request) bool //函数返回error则中断执行
 	Name string
 }
 
@@ -90,9 +90,9 @@ func RegisterGlobalHttpChan(handle *HttpChan) {
 
 func init() {
 	var defHttpHandle = HttpChan{
-		Func: func(w http.ResponseWriter, r *http.Request) error {
+		Func: func(w http.ResponseWriter, r *http.Request) bool {
 			w.Header().Set("Content-type", "application/json") //框架默认使用json处理结果
-			return nil
+			return false
 		},
 		Name: "DefHttpHandle",
 	}
@@ -168,8 +168,7 @@ func (it *Controller) Init(arg interface{}) {
 			defer GlobalErrorHandle(w, r)
 			//chan
 			for _, v := range GlobalHttpChan {
-				var e = v.Func(w, r)
-				if e != nil {
+				if v.Func(w, r) {
 					return
 				}
 			}
