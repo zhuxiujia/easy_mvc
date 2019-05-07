@@ -23,6 +23,7 @@ func (it *Controller) Init(arg interface{}) {
 	}
 	argType = argType.Elem()
 	var v = reflect.ValueOf(arg).Elem()
+	var rootPath = checkHaveRootPath(argType)
 	for i := 0; i < argType.NumField(); i++ {
 		var funcField = argType.Field(i)
 		var field = v.Field(i)
@@ -32,8 +33,7 @@ func (it *Controller) Init(arg interface{}) {
 		if funcField.Type.NumOut() > 1 {
 			continue
 		}
-
-		var tagPath = funcField.Tag.Get("path")
+		var tagPath = rootPath + funcField.Tag.Get("path")
 		var tagArg = funcField.Tag.Get("arg")
 		var tagArgs []string
 		if tagArg != "" {
@@ -96,6 +96,17 @@ func (it *Controller) Init(arg interface{}) {
 		http.HandleFunc(tagPath, httpFunc)
 	}
 
+}
+
+func checkHaveRootPath(argType reflect.Type) string {
+	for i := 0; i < argType.NumField(); i++ {
+		var field = argType.Field(i)
+		if field.Type.String() == "easy_mvc.Controller" {
+			var rootPath = field.Tag.Get("path")
+			return rootPath
+		}
+	}
+	return ""
 }
 
 func convert(value string, tItemTypeFieldType reflect.Type, w http.ResponseWriter, r *http.Request) (reflect.Value, error) {
