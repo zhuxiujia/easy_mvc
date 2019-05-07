@@ -152,6 +152,15 @@ func (it *Controller) Init(arg interface{}) {
 		if len(tagArgs) != funcField.Type.NumIn() {
 			panic("[easy_mvc] " + argType.String() + "." + funcField.Name + "() args.len(" + fmt.Sprint(funcField.Type.NumIn()) + ") != tag arg.len(" + fmt.Sprint(len(tagArgs)) + ")!")
 		}
+		//反射方法类型
+		var funSplits = [][]string{}
+		var funInTypes = []reflect.Type{}
+		for i := 0; i < funcField.Type.NumIn(); i++ {
+			funInTypes = append(funInTypes, funcField.Type.In(i))
+			var defs = strings.Split(tagArgs[i], ":")
+			funSplits = append(funSplits, defs)
+		}
+
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
 			//default param
@@ -165,9 +174,9 @@ func (it *Controller) Init(arg interface{}) {
 				}
 			}
 			var args = []reflect.Value{}
-			for i := 0; i < funcField.Type.NumIn(); i++ {
-				var argItemType = funcField.Type.In(i)
-				var defs = strings.Split(tagArgs[i], ":")
+			for i := 0; i < len(funInTypes); i++ {
+				var argItemType = funInTypes[i]
+				var defs = funSplits[i]
 				var httpArg = r.Form.Get(defs[0]) //http arg
 				var convertV, e = convert(httpArg, argItemType, w, r)
 				if convertV.IsValid() && e == nil {
