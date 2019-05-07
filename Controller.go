@@ -3,6 +3,7 @@ package easy_mvc
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -10,7 +11,8 @@ import (
 	"time"
 )
 
-var DefHttpChan = []func(w http.ResponseWriter, r *http.Request) error{}
+//全局http调用链，过滤器
+var GlobalHttpChan = []func(w http.ResponseWriter, r *http.Request) error{}
 
 type Controller struct {
 	check_null_str string
@@ -34,6 +36,9 @@ func (it *Controller) Init(arg interface{}) {
 			continue
 		}
 		var tagPath = rootPath + funcField.Tag.Get("path")
+		if tagPath == "" {
+			continue
+		}
 		var tagArg = funcField.Tag.Get("arg")
 		var tagArgs []string
 		if tagArg != "" {
@@ -48,7 +53,7 @@ func (it *Controller) Init(arg interface{}) {
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
 			//chan
-			for _, v := range DefHttpChan {
+			for _, v := range GlobalHttpChan {
 				var e = v(w, r)
 				if e != nil {
 					return
@@ -93,6 +98,7 @@ func (it *Controller) Init(arg interface{}) {
 				w.Write(b)
 			}
 		}
+		log.Println("[easy_mvc] http Handle " + funcField.Name + " " + funcField.Type.String() + string(" "+funcField.Tag))
 		http.HandleFunc(tagPath, httpFunc)
 	}
 
