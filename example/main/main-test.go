@@ -21,7 +21,8 @@ type TestController struct {
 	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r"`
 
-	UserInfo func() interface{} `path:"/api/login2"`
+	UserInfo  func() interface{}                `path:"/api/login2"`
+	UserInfo2 func() (interface{}, interface{}) `path:"/api/login2"`
 }
 
 func (it TestController) New() TestController {

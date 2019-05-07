@@ -134,6 +134,7 @@ func (it *Controller) Init(arg interface{}) {
 			continue
 		}
 		if funcField.Type.NumOut() > 1 {
+			log.Println("[easy_rpc] warning ============= " + funcField.Name + " " + funcField.Type.String() + " not registed to http!")
 			continue
 		}
 		var tagPath = rootPath + funcField.Tag.Get("path")
