@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var DefHttpChan = []func(w http.ResponseWriter, r *http.Request) error{}
+
 type Controller struct {
 	check_null_str string
 }
@@ -45,6 +47,15 @@ func (it *Controller) Init(arg interface{}) {
 		}
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
+			//chan
+			for _, v := range DefHttpChan {
+				var e = v(w, r)
+				if e != nil {
+					return
+				}
+			}
+
+			//default param
 			r.ParseForm()
 			var args = []reflect.Value{}
 			for i := 0; i < funcField.Type.NumIn(); i++ {
