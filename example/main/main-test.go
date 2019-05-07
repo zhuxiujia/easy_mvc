@@ -1,11 +1,8 @@
-package example
+package main
 
 import (
 	"github.com/zhuxiujia/easy_mvc"
 	"net/http"
-	"os"
-	"testing"
-	"time"
 )
 
 type TestUserVO struct {
@@ -39,7 +36,7 @@ func (it TestController) New() TestController {
 	return it
 }
 
-func TestController_Init(t *testing.T) {
+func main() {
 	//自定义一个全局错误处理器 到调用链中
 	easy_mvc.RegisterGlobalErrorHandleChan(&easy_mvc.HttpErrorHandle{
 		Func: func(err interface{}, w http.ResponseWriter, r *http.Request) {
@@ -59,15 +56,7 @@ func TestController_Init(t *testing.T) {
 		writer.Write([]byte("yes"))
 	})
 
-	go func() {
-		var exitTimeSec = 30
-		for i := 0; i < exitTimeSec; i++ {
-			time.Sleep(time.Second)
-			println("测试倒计时：", exitTimeSec-i, "秒后退出！")
-		}
-		os.Exit(0) //30秒后退出测试，
-	}()
-
+	println("启动成功··")
 	//使用标准库启动http
 	http.ListenAndServe("127.0.0.1:8080", nil)
 }
