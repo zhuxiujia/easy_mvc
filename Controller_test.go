@@ -2,7 +2,6 @@ package easy_mvc
 
 import (
 	"net/http"
-	"strconv"
 	"testing"
 )
 
@@ -12,7 +11,7 @@ type TestUserVO struct {
 
 type TestController struct {
 	Controller `path:"/api"`
-	Login      func(phone string, pwd string, age *int) interface{}                `path:"/login" arg:"phone,pwd,age:1" note:"phone:手机号,pwd:密码,age:年龄"`
+	Login      func(phone string, pwd string, age *int) interface{}                `path:"/login" arg:"phone,pwd,age" note:"phone:手机号,pwd:密码,age:年龄"`
 	Login2     func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"w,r"`
 	Login3     func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r"`
 	Login4     func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r"`
@@ -22,10 +21,8 @@ type TestController struct {
 
 func (it TestController) New() TestController {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
-		if *age == 2 {
-			panic("sdfa") //测试为2时 抛出异常
-		}
-		return phone + pwd + strconv.Itoa(*age)
+		println("do Login")
+		return phone + pwd
 	}
 	it.UserInfo = func() interface{} {
 		return TestUserVO{}

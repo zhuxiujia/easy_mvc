@@ -130,11 +130,9 @@ func (it *Controller) Init(arg interface{}) {
 				var defs = strings.Split(tagArgs[i], ":")
 				var httpArg = r.Form.Get(defs[0]) //http arg
 				var convertV, e = convert(httpArg, argItemType, w, r)
-				if convertV.IsValid() && e == nil || len(defs) == 2 {
-					if convertV.IsValid() && e == nil {
-						args = append(args, convertV)
-					} else {
-						var convertV, e = convert(defs[1], argItemType, w, r)
+				if convertV.IsValid() && e == nil {
+					if len(defs) == 2 && convertV.IsNil() {
+						convertV, e = convert(defs[1], argItemType, w, r)
 						if e != nil {
 							var errStr = ""
 							if e != nil {
@@ -143,9 +141,24 @@ func (it *Controller) Init(arg interface{}) {
 							w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
 							return
 						}
-						args = append(args, convertV)
 					}
+					args = append(args, convertV)
 				} else {
+					if len(defs) == 2 {
+						convertV, e = convert(defs[1], argItemType, w, r)
+						if e != nil {
+							var errStr = ""
+							if e != nil {
+								errStr = "  error = " + e.Error()
+							}
+							w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
+							return
+						}
+					}
+					if argItemType.Kind() == reflect.Ptr {
+						args = append(args, convertV)
+						continue
+					}
 					var errStr = ""
 					if e != nil {
 						errStr = "  error = " + e.Error()
@@ -248,6 +261,9 @@ func convert(value string, tItemTypeFieldType reflect.Type, w http.ResponseWrite
 		} else if tItemTypeFieldType.Kind() == reflect.Ptr {
 			if tItemTypeFieldType.String() == "*http.Request" {
 				return reflect.ValueOf(r), nil
+			}
+			if value == "" {
+				return reflect.Zero(tItemTypeFieldType), nil
 			}
 			var v, e = convert(value, tItemTypeFieldType.Elem(), w, r)
 			var newPtrV = reflect.New(tItemTypeFieldType.Elem())
