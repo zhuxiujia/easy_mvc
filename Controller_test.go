@@ -11,7 +11,7 @@ type TestUserVO struct {
 }
 
 type TestController struct {
-	Controller `path:"/api" rest_controller:""`
+	Controller `path:"/api"`
 	Login      func(phone string, pwd string, age *int) interface{}                `path:"/login" arg:"phone,pwd,age:1" note:"phone:手机号,pwd:密码,age:年龄"`
 	Login2     func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"w,r"`
 	Login3     func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r"`
@@ -22,6 +22,7 @@ type TestController struct {
 
 func (it TestController) New() TestController {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
+		panic("sdfa")
 		return phone + pwd + strconv.Itoa(*age)
 	}
 	it.UserInfo = func() interface{} {
@@ -35,6 +36,11 @@ func (it TestController) New() TestController {
 }
 
 func TestController_Init(t *testing.T) {
+
+	GlobalErrorHandleChan = append(GlobalErrorHandleChan, func(err interface{}) {
+		println(err.(error).Error())
+	})
+
 	TestController{}.New()
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
