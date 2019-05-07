@@ -52,7 +52,7 @@ func RegisterGlobalHttpChan(handle *HttpChan) {
 func init() {
 	var defHttpHandle = HttpChan{
 		Func: func(w http.ResponseWriter, r *http.Request) error {
-			w.Header().Set("Content-type", "application/json")
+			w.Header().Set("Content-type", "application/json") //框架默认使用json处理结果
 			return nil
 		},
 		Name: "DefHttpHandle",
