@@ -1,1 +1,8 @@
 GO mvc框架，支持IOC,AOP,DI 基于golang标准库,http库和Tag机制实现.免生成中间代码，非常容易使用
+
+##核心特性
+* 轻量 完全兼容标准库的http，可以混合使用，扩展性高
+* 过滤链支持
+* 错误处理器链支持
+* 使用tag 定义 http请求参数，包含 *int,*string,*float 同时支持标准库的 writer http.ResponseWriter, request *http.Request
+* root path支持，类似spring controller定义一个基础的path加控制器具体方法的http path
