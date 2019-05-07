@@ -114,6 +114,8 @@ func (it *Controller) Init(arg interface{}) {
 		}
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
+			//default param
+			r.ParseForm()
 			defer GlobalErrorHandle(w, r)
 			//chan
 			for _, v := range GlobalHttpChan {
@@ -122,8 +124,6 @@ func (it *Controller) Init(arg interface{}) {
 					return
 				}
 			}
-			//default param
-			r.ParseForm()
 			var args = []reflect.Value{}
 			for i := 0; i < funcField.Type.NumIn(); i++ {
 				var argItemType = funcField.Type.In(i)
