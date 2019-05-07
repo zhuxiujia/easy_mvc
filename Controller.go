@@ -22,11 +22,18 @@ type HttpErrorHandle struct {
 	Name string
 }
 
+type HttpResultHandle struct {
+	Func func(result *interface{}, w http.ResponseWriter, r *http.Request) bool
+	Name string
+}
+
 //全局http调用链，过滤器,return error 不为nil则不继续执行
 var GlobalHttpChan = []*HttpChan{}
 
 //全局错误调用链
 var GlobalErrorHandleChan = []*HttpErrorHandle{}
+
+var GlobalResultHandleChan = []*HttpResultHandle{}
 
 //全局错误处理器
 var GlobalErrorHandle = func(w http.ResponseWriter, r *http.Request) {
@@ -40,12 +47,44 @@ var GlobalErrorHandle = func(w http.ResponseWriter, r *http.Request) {
 }
 
 //注册全局错误
+func RegisterGlobalResultHandleChan(handle *HttpResultHandle) {
+	if handle == nil {
+		return
+	}
+	if handle.Name == "" {
+		panic("[easy_mvc] handle must have a name!")
+	}
+	for index, v := range GlobalResultHandleChan {
+		if v.Name == handle.Name {
+			GlobalResultHandleChan[index] = v
+		}
+	}
+	GlobalResultHandleChan = append(GlobalResultHandleChan, handle)
+}
+
+//注册全局错误
 func RegisterGlobalErrorHandleChan(handle *HttpErrorHandle) {
+	if handle.Name == "" {
+		panic("[easy_mvc] handle must have a name!")
+	}
+	for index, v := range GlobalErrorHandleChan {
+		if v.Name == handle.Name {
+			GlobalErrorHandleChan[index] = v
+		}
+	}
 	GlobalErrorHandleChan = append(GlobalErrorHandleChan, handle)
 }
 
 //注册http调用链/过滤器
 func RegisterGlobalHttpChan(handle *HttpChan) {
+	if handle.Name == "" {
+		panic("[easy_mvc] handle must have a name!")
+	}
+	for index, v := range GlobalHttpChan {
+		if v.Name == handle.Name {
+			GlobalHttpChan[index] = v
+		}
+	}
 	GlobalHttpChan = append(GlobalHttpChan, handle)
 }
 
@@ -172,7 +211,13 @@ func (it *Controller) Init(arg interface{}) {
 			if results != nil && len(results) > 0 {
 				switch contentType {
 				case "application/json":
-					var b, _ = json.Marshal(results[0].Interface())
+					var result = results[0].Interface()
+					for _, item := range GlobalResultHandleChan {
+						if item.Func(&result, w, r) { //success return,else next
+							return
+						}
+					}
+					var b, _ = json.Marshal(result)
 					w.Write(b)
 					break
 				}

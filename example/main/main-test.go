@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
 	"github.com/zhuxiujia/easy_mvc"
 	"net/http"
+	"reflect"
+	"strings"
 )
 
 type TestUserVO struct {
@@ -24,7 +27,7 @@ type TestController struct {
 func (it TestController) New() TestController {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
 		println("do Login")
-		return TestUserVO{}
+		return errors.New("dsf")
 	}
 	it.UserInfo = func() interface{} {
 		return TestUserVO{}
@@ -45,7 +48,18 @@ func main() {
 				w.Write([]byte(err.(error).Error()))
 			}
 		},
-		Name: "custom",
+		Name: "ErrorFilter",
+	})
+
+	easy_mvc.RegisterGlobalResultHandleChan(&easy_mvc.HttpResultHandle{
+		Func: func(result *interface{}, w http.ResponseWriter, r *http.Request) bool {
+			var v = reflect.ValueOf(*result)
+			if strings.Contains(v.Type().String(), "error") {
+				*result = TestUserVO{}
+			}
+			return false
+		},
+		Name: "ResultFilter",
 	})
 
 	//初始化 控制器
