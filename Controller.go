@@ -118,7 +118,6 @@ func init() {
 //例如 SendSms(writer http.ResponseWriter, request *http.Request)  `path:"/" arg:"w,r" `
 //模板 `path:"" arg:"" `
 type Controller struct {
-	check_null_str string
 }
 
 func (it *Controller) Init(arg interface{}) {
