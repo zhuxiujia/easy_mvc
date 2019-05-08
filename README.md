@@ -3,8 +3,9 @@
 ## 核心特性
 
 * 轻量 完全兼容标准库的http，可以混合使用，扩展性高
-* 拦截器链 支持
-* 错误处理器链 支持
+* 拦截器 支持
+* 过滤器 支持
+* 全局错误处理器链 支持
 * 使用tag 定义 http请求参数，包含 *int,*string,*float 同时支持标准库的 writer http.ResponseWriter, request *http.Request
 * 支持参数默认值 只需在tag中 定义，例如 func(phone string, pwd string, age *int) interface{} arg:"phone,pwd,age:1"  其中 arg没有传参则默认为1
 * 指针参数可为空（nil）非指针参数 如果没有值框架会拦截
