@@ -121,16 +121,22 @@ type Controller struct {
 }
 
 func (it *Controller) Init(arg interface{}) {
-	var argType = reflect.TypeOf(arg)
-	if argType.Kind() != reflect.Ptr {
-		panic("[easy_mvc] Init value " + argType.String() + " must be a ptr!")
+	var argV = reflect.ValueOf(arg)
+	if argV.Kind() != reflect.Ptr {
+		panic("[easy_mvc] Init value " + argV.String() + " must be a ptr!")
 	}
-	argType = argType.Elem()
-	var v = reflect.ValueOf(arg).Elem()
+	for {
+		if argV.Kind() == reflect.Ptr {
+			argV = argV.Elem()
+		} else {
+			break
+		}
+	}
+	var argType = argV.Type()
 	var rootPath = checkHaveRootPath(argType)
 	for i := 0; i < argType.NumField(); i++ {
 		var funcField = argType.Field(i)
-		var field = v.Field(i)
+		var field = argV.Field(i)
 		if funcField.Type.Kind() != reflect.Func {
 			continue
 		}

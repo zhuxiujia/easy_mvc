@@ -18,14 +18,14 @@ type TestController struct {
 	Login func(phone string, pwd string, age *int) interface{} `path:"/login" arg:"phone,pwd,age" note:"phone:手机号,pwd:密码,age:年龄"`
 	//兼容go标准库http案例,可以无返回值
 	Login2 func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"w,r"`
-	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r"`
+	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r"`
 
 	UserInfo  func() interface{}                `path:"/api/login2"`
 	UserInfo2 func() (interface{}, interface{}) `path:"/api/login2"`
 }
 
-func (it TestController) New() TestController {
+func (it *TestController) New() {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
 		println("do Login")
 		return errors.New("dsf")
@@ -36,8 +36,12 @@ func (it TestController) New() TestController {
 	it.Login2 = func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("fuck"))
 	}
-	it.Init(&it)
-	return it
+	it.Login3 = func(writer http.ResponseWriter, request *http.Request) interface{} {
+
+		return nil
+	}
+
+	it.Init(&it) //必须初始化，而且是指针
 }
 
 func main() {
@@ -64,7 +68,8 @@ func main() {
 	})
 
 	//初始化 控制器
-	TestController{}.New()
+	var testController = TestController{}
+	testController.New()
 
 	//你也可以使用标准库的api（使用标准库不经过easy_mvc）
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
