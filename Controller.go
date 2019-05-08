@@ -123,7 +123,7 @@ type Controller struct {
 func (it *Controller) Init(arg interface{}) {
 	var argV = reflect.ValueOf(arg)
 	if argV.Kind() != reflect.Ptr {
-		panic("[easy_mvc] Init value " + argV.String() + " must be a ptr!")
+		panic("[easy_mvc] Init value " + argV.String() + " must be struct{} ptr!")
 	}
 	for {
 		if argV.Kind() == reflect.Ptr {
@@ -132,6 +132,10 @@ func (it *Controller) Init(arg interface{}) {
 			break
 		}
 	}
+	if argV.Type().Kind() != reflect.Struct {
+		panic("[easy_mvc] Init value must be a struct{} ptr!")
+	}
+
 	var argType = argV.Type()
 	var rootPath = checkHaveRootPath(argType)
 	for i := 0; i < argType.NumField(); i++ {
