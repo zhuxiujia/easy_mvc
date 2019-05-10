@@ -3,7 +3,7 @@
 ## 核心特性
 
 * 轻量 完全兼容标准库的http，意味着和标准库一般稳定，可以混合搭配使用，扩展性极高
-* 拦截器 支持（例如非常方便的检查用户登录，提取用户登录数据）
+* 拦截器 支持（例如非常方便的检查用户登录，提取用户登录数据，支持JWT token，Oath2Token更加方便的接入）
 * 过滤器 支持
 * 全局错误处理器链 支持
 * 使用tag 定义 http请求参数，包含 *int,*string,*float 同时支持标准库的 writer http.ResponseWriter, request *http.Request
