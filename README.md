@@ -10,8 +10,7 @@
 * 支持参数默认值 只需在tag中 定义，例如 func(phone string, pwd string, age *int) interface{} arg:"phone,pwd,age:1"  其中 arg没有传参则默认为1
 * 指针参数可为空（nil）非指针参数 如果没有值框架会拦截
 * root path支持，类似spring controller定义一个基础的path加控制器具体方法的http path
-* 基于Tag和反射动态文档,免除繁琐的文档编写和代码生成（即将到来）
-* 支持swagger ui 动态文档，免生成任何中间go文件
+* 支持swagger ui 动态文档，免生成任何中间go文件 基于Tag和反射实现的swagger动态文档
 
 
 ## Controller
