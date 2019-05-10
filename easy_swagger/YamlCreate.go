@@ -30,7 +30,7 @@ func ScanControllerContext() []byte {
 	easy_mvc.ControllerTable.Range(func(key, value interface{}) bool {
 		var items = Scan(value)
 		swaApis = append(swaApis, items...)
-		return false
+		return true
 	})
 	return CreateSwaggerYaml(swaApis)
 }
