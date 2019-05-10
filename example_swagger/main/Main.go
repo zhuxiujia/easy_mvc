@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/zhuxiujia/easy_mvc"
-	"github.com/zhuxiujia/easy_mvc/example_swagger"
+	"github.com/zhuxiujia/easy_mvc/easy_swagger"
+	_ "github.com/zhuxiujia/easy_mvc/easy_swagger/dist/statik"
 	"net/http"
 )
 
@@ -21,13 +22,13 @@ type TestController struct {
 	UserInfo func() interface{} `path:"/api/login2"`
 }
 
-func main() {
 
-	var bytes = example_swagger.CreateSwaggerYaml(example_swagger.Scan(&TestController{}))
-	http.HandleFunc("/doc", func(w http.ResponseWriter, r *http.Request) {
-		//w.Header().Set("Content-Type","application/yaml")
-		w.Write(bytes)
-	})
-	http.Handle("/", http.FileServer(http.Dir("D:/download/swagger-ui-master/dist/")))
-	http.ListenAndServe(":8080", nil)
+
+
+func main() {
+	var controller=TestController{}
+	controller.Init(&controller) //初始化
+
+	easy_swagger.EnableSwagger("localhost:9993")
+	http.ListenAndServe("localhost:9993", nil)
 }
