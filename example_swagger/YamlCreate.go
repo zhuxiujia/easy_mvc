@@ -86,6 +86,7 @@ func Scan(arg interface{}) []SwaggerApi {
 		}
 		api.Path = tagPath
 		api.Method = "post"
+		api.Api_description = funcField.Tag.Get("doc")
 		result = append(result, api)
 	}
 	return result
@@ -103,11 +104,11 @@ func checkHaveRootPath(argType reflect.Type) string {
 }
 
 type SwaggerApi struct {
-	Param                  []Param
-	Controller             string
-	Controller_description string
-	Path                   string
-	Method                 string
+	Param           []Param
+	Controller      string
+	Api_description string
+	Path            string
+	Method          string
 }
 
 func CreateSwaggerYaml(arg []SwaggerApi) []byte {
@@ -121,8 +122,8 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 		var parameters = map[interface{}]interface{}{}
 		parameters["tags"] = []string{item.Controller}
 		parameters["parameters"] = paramter
-		parameters["summary"] = ""
-		parameters["description"] = ""
+		parameters["summary"] = item.Api_description
+		parameters["description"] = item.Api_description
 		parameters["responses"] = map[interface{}]interface{}{200: map[interface{}]interface{}{"description": "OK"}} //不变
 		var pet = map[interface{}]interface{}{}
 		pet[item.Method] = parameters
@@ -139,7 +140,7 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 	}
 	var controllers = []map[interface{}]interface{}{}
 	for _, item := range arg {
-		controllers = append(controllers, map[interface{}]interface{}{"name": item.Controller, "description": item.Controller_description})
+		controllers = append(controllers, map[interface{}]interface{}{"name": item.Controller, "description": ""})
 	}
 	root["tags"] = controllers
 	d, _ := yaml.Marshal(&root)
