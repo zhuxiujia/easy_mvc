@@ -201,6 +201,7 @@ func (it *Controller) Init(arg interface{}) {
 					}
 					args = append(args, convertV)
 				} else {
+					var convertSuccess *reflect.Value
 					if len(defs) == 2 {
 						convertV, e = convert(defs[1], argItemType, w, r)
 						if e != nil {
@@ -210,9 +211,11 @@ func (it *Controller) Init(arg interface{}) {
 							}
 							w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
 							return
+						} else {
+							convertSuccess = &convertV
 						}
 					}
-					if argItemType.Kind() == reflect.Ptr {
+					if argItemType.Kind() == reflect.Ptr || convertSuccess != nil {
 						args = append(args, convertV)
 						continue
 					}
