@@ -191,10 +191,7 @@ func (it *Controller) Init(arg interface{}) {
 					if len(defs) == 2 && convertV.IsNil() {
 						convertV, e = convert(defs[1], argItemType, w, r)
 						if e != nil {
-							var errStr = ""
-							if e != nil {
-								errStr = "  error = " + e.Error()
-							}
+							var errStr = "  error = " + e.Error()
 							w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
 							return
 						}
