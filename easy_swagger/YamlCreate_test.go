@@ -1,4 +1,4 @@
-package example_swagger
+package easy_swagger
 
 import (
 	"fmt"

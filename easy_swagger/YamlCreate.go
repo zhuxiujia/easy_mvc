@@ -1,19 +1,41 @@
-package example_swagger
+package easy_swagger
 
 import (
+	"fmt"
+	"github.com/zhuxiujia/easy_mvc"
 	"gopkg.in/yaml.v2"
 	"log"
 	"reflect"
 	"strings"
 )
 
-type Param struct {
+type SwaggerParam struct {
 	Name        string `yaml:"name"`
 	In          string `yaml:"in"`
 	Description string `yaml:"description"`
 	Type        string `yaml:"type"`
 }
 
+type SwaggerApi struct {
+	Param           []SwaggerParam
+	Controller      string
+	Api_description string
+	Path            string
+	Method          string
+}
+
+//扫描上下文生成swagger的yaml
+func ScanControllerContext() []byte {
+	var swaApis = []SwaggerApi{}
+	easy_mvc.ControllerTable.Range(func(key, value interface{}) bool {
+		var items = Scan(value)
+		swaApis = append(swaApis, items...)
+		return false
+	})
+	return CreateSwaggerYaml(swaApis)
+}
+
+//扫描一个controller结构体
 func Scan(arg interface{}) []SwaggerApi {
 	var argV = reflect.ValueOf(arg)
 	if argV.Kind() != reflect.Ptr {
@@ -55,6 +77,10 @@ func Scan(arg interface{}) []SwaggerApi {
 		} else {
 			tagArgs = []string{}
 		}
+		//check len
+		if len(tagArgs) != funcField.Type.NumIn() {
+			panic("[easy_mvc] " + argType.String() + "." + funcField.Name + "() args.len(" + fmt.Sprint(funcField.Type.NumIn()) + ") != tag arg.len(" + fmt.Sprint(len(tagArgs)) + ")!")
+		}
 
 		var docArg = funcField.Tag.Get("doc_arg")
 		var noteMap = map[string]string{}
@@ -76,7 +102,7 @@ func Scan(arg interface{}) []SwaggerApi {
 			var defs = strings.Split(tagArgs[i], ":")
 			funSplits = append(funSplits, defs)
 
-			api.Param = append(api.Param, Param{
+			api.Param = append(api.Param, SwaggerParam{
 				Name:        tagArgs[i],
 				In:          "query",
 				Description: noteMap[tagArgs[i]],
@@ -103,21 +129,13 @@ func checkHaveRootPath(argType reflect.Type) string {
 	return ""
 }
 
-type SwaggerApi struct {
-	Param           []Param
-	Controller      string
-	Api_description string
-	Path            string
-	Method          string
-}
-
 func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 	root := make(map[interface{}]interface{})
 	var paths = map[interface{}]interface{}{}
 	for _, item := range arg {
-		var paramter = []Param{}
+		var paramter = []SwaggerParam{}
 		for _, argItem := range item.Param {
-			paramter = append(paramter, Param{Name: argItem.Name, Type: argItem.Type, In: argItem.In, Description: argItem.Description})
+			paramter = append(paramter, SwaggerParam{Name: argItem.Name, Type: argItem.Type, In: argItem.In, Description: argItem.Description})
 		}
 		var parameters = map[interface{}]interface{}{}
 		parameters["tags"] = []string{item.Controller}

@@ -244,7 +244,8 @@ func (it *Controller) Init(arg interface{}) {
 		log.Println("[easy_mvc] http Handle " + funcField.Name + " " + funcField.Type.String() + string(" "+funcField.Tag))
 		http.HandleFunc(tagPath, httpFunc)
 	}
-
+	//存入上下文
+	ControllerTable.Store(argType.Name(), arg)
 }
 
 func checkHaveRootPath(argType reflect.Type) string {

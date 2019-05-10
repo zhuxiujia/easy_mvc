@@ -1,6 +1,9 @@
 package easy_mvc
 
-import "github.com/facebookgo/inject"
+import (
+	"github.com/facebookgo/inject"
+	"sync"
+)
 
 var Context inject.Graph
 
@@ -10,3 +13,5 @@ func Provide(name string, value interface{}) {
 		Value: value,
 	})
 }
+
+var ControllerTable = sync.Map{}
