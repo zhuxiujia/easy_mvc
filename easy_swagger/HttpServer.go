@@ -3,6 +3,7 @@ package easy_swagger
 import (
 	"github.com/rakyll/statik/fs"
 	_ "github.com/zhuxiujia/easy_mvc/easy_swagger/dist/statik"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -103,6 +104,6 @@ func EnableSwagger(serverAddr string) {
 	http.Handle("/swagger", &h)
 
 
-
+    log.Println("[easy_mvc] swagger ui start on :"+serverAddr+"/swagger")
 	//http.ListenAndServe(serverAddr, nil) 这里由用户构建（最后调用）
 }
