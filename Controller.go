@@ -169,6 +169,7 @@ func (it *Controller) Init(arg interface{}) {
 			var defs = strings.Split(tagArgs[i], ":")
 			funSplits = append(funSplits, defs)
 		}
+		var method = funcField.Tag.Get("method")
 
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
@@ -181,6 +182,14 @@ func (it *Controller) Init(arg interface{}) {
 					return
 				}
 			}
+
+			if method != ""{
+				if !strings.EqualFold(r.Method,method){
+					w.Write([]byte("[easy_mvc] http method not allow! current use:"+r.Method+"you must use:" + method))
+					return
+				}
+			}
+
 			var args = []reflect.Value{}
 			for i := 0; i < len(funInTypes); i++ {
 				var argItemType = funInTypes[i]
