@@ -138,7 +138,8 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			if len(defs) > 1 {
 				swaggerParam.Default = defs[1]
 			}
-			if funcType.Kind() == reflect.Ptr {
+			println(funcType.String())
+			if funcType.Kind() == reflect.Ptr ||  funcType.Kind()==reflect.String || funcType.String()=="http.ResponseWriter" || funcType.String()=="*http.Request"{
 				swaggerParam.Required = false
 			} else {
 				swaggerParam.Required = true
