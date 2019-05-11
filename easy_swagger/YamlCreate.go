@@ -14,6 +14,8 @@ type SwaggerParam struct {
 	In          string `yaml:"in"`
 	Description string `yaml:"description"`
 	Type        string `yaml:"type"`
+	Default     string `yaml:"default"`
+	Required    bool   `yaml:"required"`
 }
 
 type SwaggerApi struct {
@@ -102,12 +104,22 @@ func Scan(arg interface{}) []SwaggerApi {
 			var defs = strings.Split(tagArgs[i], ":")
 			funSplits = append(funSplits, defs)
 
-			api.Param = append(api.Param, SwaggerParam{
-				Name:        tagArgs[i],
+			//defs[1] 为默认值
+			var swaggerParam = SwaggerParam{
+				Name:        defs[0],
 				In:          "query",
 				Description: noteMap[tagArgs[i]],
 				Type:        funcType.Name(),
-			})
+			}
+			if len(defs) > 1 {
+				swaggerParam.Default = defs[1]
+			}
+			if funcType.Kind() == reflect.Ptr {
+				swaggerParam.Required = false
+			} else {
+				swaggerParam.Required = true
+			}
+			api.Param = append(api.Param, swaggerParam)
 
 		}
 		api.Path = tagPath
@@ -135,7 +147,7 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 	for _, item := range arg {
 		var paramter = []SwaggerParam{}
 		for _, argItem := range item.Param {
-			paramter = append(paramter, SwaggerParam{Name: argItem.Name, Type: argItem.Type, In: argItem.In, Description: argItem.Description})
+			paramter = append(paramter, argItem)
 		}
 		var parameters = map[interface{}]interface{}{}
 		parameters["tags"] = []string{item.Controller}
