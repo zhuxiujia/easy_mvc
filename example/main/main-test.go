@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"github.com/zhuxiujia/easy_mvc"
 	"github.com/zhuxiujia/easy_mvc/easy_swagger"
 	"net/http"
@@ -28,8 +28,13 @@ type TestController struct {
 
 func (it *TestController) New() {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
-		println("do Login")
-		return errors.New("dsf")
+		var ageStr=""
+		if age!=nil{
+			ageStr=fmt.Sprint(*age)
+		}else{
+			ageStr="nil"
+		}
+		return fmt.Sprint("do Login phone string, pwd string, age *int :",phone,",",pwd,",",ageStr)
 	}
 	it.UserInfo = func() interface{} {
 		return TestUserVO{}
