@@ -1,6 +1,7 @@
 package easy_mvc
 
 import (
+	"errors"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -86,5 +87,5 @@ func convert(value string, tItemTypeFieldType reflect.Type, w http.ResponseWrite
 		}
 	}
 
-	return reflect.Value{}, nil
+	return reflect.Value{}, errors.New("convert fail")
 }

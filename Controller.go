@@ -188,7 +188,7 @@ func (it *Controller) Init(arg interface{}) {
 				var httpArg = r.Form.Get(defs[0]) //http arg
 				var convertV, e = convert(httpArg, argItemType, w, r)
 				if convertV.IsValid() && e == nil {
-					if len(defs) == 2 && convertV.IsNil() {
+					if argItemType.Kind() == reflect.Ptr && convertV.IsNil() && len(defs) == 2 {
 						convertV, e = convert(defs[1], argItemType, w, r)
 						if e != nil {
 							var errStr = "  error = " + e.Error()
