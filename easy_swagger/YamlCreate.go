@@ -100,11 +100,13 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 
 		var MustKeys []SwaggerParam
 		if config.AppendParam != nil {
-			if config.AppendParam.Path == "" {
-				MustKeys = config.AppendParam.MustKey
-			} else {
-				if strings.Contains(tagPath, config.AppendParam.Path) {
-					MustKeys = config.AppendParam.MustKey
+			for _, v := range config.AppendParam {
+				if v.Path == "" {
+					MustKeys = v.MustKey
+				} else {
+					if strings.Contains(tagPath, v.Path) {
+						MustKeys = v.MustKey
+					}
 				}
 			}
 		}
