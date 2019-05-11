@@ -147,6 +147,20 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 	for _, item := range arg {
 		var paramter = []SwaggerParam{}
 		for _, argItem := range item.Param {
+			switch argItem.Type {
+			case "int":
+				argItem.Type = "integer"
+				break
+			case "int16":
+				argItem.Type = "integer"
+				break
+			case "int32":
+				argItem.Type = "integer"
+				break
+			case "int64":
+				argItem.Type = "integer"
+				break
+			}
 			paramter = append(paramter, argItem)
 		}
 		var parameters = map[interface{}]interface{}{}
