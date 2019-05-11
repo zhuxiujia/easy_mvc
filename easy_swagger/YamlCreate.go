@@ -128,17 +128,24 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			var defs = strings.Split(tagArgs[i], ":")
 			funSplits = append(funSplits, defs)
 
+
+			var funcTypeName string
+			if funcType.Kind() == reflect.Ptr {
+				funcTypeName = funcType.Elem().Name()
+			}else{
+				funcTypeName=funcType.Name()
+			}
 			//defs[1] 为默认值
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
 				Description: noteMap[tagArgs[i]],
-				Type:        funcType.Name(),
+				Type:        funcTypeName,
 			}
 			if len(defs) > 1 {
 				swaggerParam.Default = defs[1]
 			}
-			if funcType.Kind() == reflect.Ptr ||  funcType.Kind()==reflect.String || funcType.String()=="http.ResponseWriter" || funcType.String()=="*http.Request"{
+			if funcType.Kind() == reflect.Ptr || funcType.Kind() == reflect.String || funcType.String() == "http.ResponseWriter" || funcType.String() == "*http.Request" {
 				swaggerParam.Required = false
 			} else {
 				swaggerParam.Required = true
@@ -174,6 +181,18 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 		var paramter = []SwaggerParam{}
 		for _, argItem := range item.Param {
 			switch argItem.Type {
+			case "uint":
+				argItem.Type = "integer"
+				break
+			case "uint16":
+				argItem.Type = "integer"
+				break
+			case "uint32":
+				argItem.Type = "integer"
+				break
+			case "uint64":
+				argItem.Type = "integer"
+				break
 			case "int":
 				argItem.Type = "integer"
 				break
@@ -185,6 +204,50 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 				break
 			case "int64":
 				argItem.Type = "integer"
+				break
+			case "float32":
+				argItem.Type = "number"
+				break
+			case "float64":
+				argItem.Type = "number"
+				break
+			case "time.Time":
+				argItem.Type = "string"
+				break
+
+				//ptr
+			case "*uint":
+				argItem.Type = "integer"
+				break
+			case "*uint16":
+				argItem.Type = "integer"
+				break
+			case "*uint32":
+				argItem.Type = "integer"
+				break
+			case "*uint64":
+				argItem.Type = "integer"
+				break
+			case "*int":
+				argItem.Type = "integer"
+				break
+			case "*int16":
+				argItem.Type = "integer"
+				break
+			case "*int32":
+				argItem.Type = "integer"
+				break
+			case "*int64":
+				argItem.Type = "integer"
+				break
+			case "*float32":
+				argItem.Type = "number"
+				break
+			case "*float64":
+				argItem.Type = "number"
+				break
+			case "*time.Time":
+				argItem.Type = "string"
 				break
 			}
 			paramter = append(paramter, argItem)
