@@ -96,14 +96,13 @@ func EnableSwagger(serverAddr string) {
 	//swagger ui 必须的js文件
 	http.Handle("/", http.FileServer(statikFS))
 
-	serverAddr = serverAddr + "/doc"
 	if !strings.Contains(serverAddr, "http://") {
 		serverAddr = "http://" + serverAddr
 	}
-	var h = IndexHtmlHandle{}.New(serverAddr)
+	var h = IndexHtmlHandle{}.New(serverAddr + "/doc")
 	http.Handle("/swagger", &h)
 
-
-    log.Println("[easy_mvc] swagger ui start on :"+serverAddr+"/swagger")
+	log.Println("[easy_mvc] swagger ui yaml config on :" + serverAddr + "/doc")
+	log.Println("[easy_mvc] swagger ui web start on :" + serverAddr + "/swagger")
 	//http.ListenAndServe(serverAddr, nil) 这里由用户构建（最后调用）
 }
