@@ -123,7 +123,10 @@ func Scan(arg interface{}) []SwaggerApi {
 
 		}
 		api.Path = tagPath
-		api.Method = "post"
+		api.Method = funcField.Tag.Get("method")
+		if api.Method == "" {
+			api.Method = "get"
+		}
 		api.Api_description = funcField.Tag.Get("doc")
 		result = append(result, api)
 	}
