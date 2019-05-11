@@ -24,6 +24,7 @@ type SwaggerApi struct {
 	Api_description string
 	Path            string
 	Method          string
+	Controller_description string
 }
 
 //扫描上下文生成swagger的yaml
@@ -54,6 +55,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 		panic("[easy_mvc] Init value must be a struct{} ptr!")
 	}
 	var result = []SwaggerApi{}
+	var Controller_description string
 
 	var argType = argV.Type()
 	var rootPath = checkHaveRootPath(argType)
@@ -61,6 +63,11 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 		var api = SwaggerApi{}
 		api.Controller = argType.Name()
 		var funcField = argType.Field(i)
+
+		if funcField.Type.String() == "easy_mvc.Controller" {
+			Controller_description = funcField.Tag.Get("doc")
+		}
+
 		if funcField.Type.Kind() != reflect.Func {
 			continue
 		}
@@ -128,12 +135,11 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			var defs = strings.Split(tagArgs[i], ":")
 			funSplits = append(funSplits, defs)
 
-
 			var funcTypeName string
 			if funcType.Kind() == reflect.Ptr {
 				funcTypeName = funcType.Elem().Name()
-			}else{
-				funcTypeName=funcType.Name()
+			} else {
+				funcTypeName = funcType.Name()
 			}
 			//defs[1] 为默认值
 			var swaggerParam = SwaggerParam{
@@ -158,8 +164,10 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			api.Method = "get"
 		}
 		api.Api_description = funcField.Tag.Get("doc")
+		api.Controller_description=Controller_description
 		result = append(result, api)
 	}
+
 	return result
 }
 
@@ -273,7 +281,7 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 	}
 	var controllers = []map[interface{}]interface{}{}
 	for _, item := range arg {
-		controllers = append(controllers, map[interface{}]interface{}{"name": item.Controller, "description": ""})
+		controllers = append(controllers, map[interface{}]interface{}{"name": item.Controller, "description": item.Controller_description})
 	}
 	root["tags"] = controllers
 	d, _ := yaml.Marshal(&root)
