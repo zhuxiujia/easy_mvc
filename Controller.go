@@ -250,7 +250,7 @@ func (it *Controller) Init(arg interface{}) {
 				}
 			}
 		}
-		log.Println("[easy_mvc] http Handle " + funcField.Name + " " + funcField.Type.String() + string(" "+funcField.Tag))
+		log.Println("[easy_mvc] http Handle " +argType.String() +"  =>  "+ funcField.Name + " " + funcField.Type.String() + string(" "+funcField.Tag))
 		http.HandleFunc(tagPath, httpFunc)
 	}
 	//存入上下文
