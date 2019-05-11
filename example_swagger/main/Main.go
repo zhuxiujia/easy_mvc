@@ -22,13 +22,10 @@ type TestController struct {
 	UserInfo func() interface{} `path:"/api/login2"`
 }
 
-
-
-
 func main() {
-	var controller=TestController{}
+	var controller = TestController{}
 	controller.Init(&controller) //初始化
 
-	easy_swagger.EnableSwagger("localhost:9993")
+	easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{})
 	http.ListenAndServe("localhost:9993", nil)
 }

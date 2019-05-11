@@ -27,10 +27,10 @@ type SwaggerApi struct {
 }
 
 //扫描上下文生成swagger的yaml
-func ScanControllerContext() []byte {
+func ScanControllerContext(config SwaggerConfig) []byte {
 	var swaApis = []SwaggerApi{}
 	easy_mvc.ControllerTable.Range(func(key, value interface{}) bool {
-		var items = Scan(value)
+		var items = Scan(value, config)
 		swaApis = append(swaApis, items...)
 		return true
 	})
@@ -38,7 +38,7 @@ func ScanControllerContext() []byte {
 }
 
 //扫描一个controller结构体
-func Scan(arg interface{}) []SwaggerApi {
+func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 	var argV = reflect.ValueOf(arg)
 	if argV.Kind() != reflect.Ptr {
 		panic("[easy_mvc] Init value " + argV.String() + " must be struct{} ptr!")
@@ -97,9 +97,31 @@ func Scan(arg interface{}) []SwaggerApi {
 				}
 			}
 		}
+
+		var MustKeys []SwaggerParam
+		if config.MustPath != nil {
+			if config.MustPath.Path == "" {
+				MustKeys = config.MustPath.MustKey
+			} else {
+				if strings.Contains(tagPath, config.MustPath.Path) {
+					MustKeys = config.MustPath.MustKey
+				}
+			}
+		}
+		var MustKeysLen = 0
+		if MustKeys != nil {
+			MustKeysLen = len(MustKeys)
+		}
+
 		//反射方法类型
 		var funSplits = [][]string{}
-		for i := 0; i < funcField.Type.NumIn(); i++ {
+		for i := 0; i < funcField.Type.NumIn()+MustKeysLen; i++ {
+
+			if (i + 1) > funcField.Type.NumIn() {
+				api.Param = append(api.Param, MustKeys[(i - funcField.Type.NumIn())])
+				continue
+			}
+
 			var funcType = funcField.Type.In(i)
 			var defs = strings.Split(tagArgs[i], ":")
 			funSplits = append(funSplits, defs)
@@ -120,7 +142,6 @@ func Scan(arg interface{}) []SwaggerApi {
 				swaggerParam.Required = true
 			}
 			api.Param = append(api.Param, swaggerParam)
-
 		}
 		api.Path = tagPath
 		api.Method = funcField.Tag.Get("method")

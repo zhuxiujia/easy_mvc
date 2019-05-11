@@ -85,8 +85,8 @@ func (it *IndexHtmlHandle) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 //启用swagger ui 配置
-func EnableSwagger(serverAddr string) {
-	var bytes = ScanControllerContext() //扫描上下文环境
+func EnableSwagger(serverAddr string,config SwaggerConfig) {
+	var bytes = ScanControllerContext(config) //扫描上下文环境
 	//doc接口放出swagger yaml配置
 	http.HandleFunc("/doc", func(w http.ResponseWriter, r *http.Request) {
 		w.Write(bytes)
