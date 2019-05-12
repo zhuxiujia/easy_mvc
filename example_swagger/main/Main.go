@@ -26,6 +26,17 @@ func main() {
 	var controller = TestController{}
 	controller.Init(&controller) //初始化
 
-	easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{})
+	easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{
+		//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{
+		//	easy_swagger.SecurityDefinition{
+		//		ApiKey: easy_swagger.ApiKey{
+		//			Type: "apiKey",
+		//			Name: "access_token",
+		//			In:   "query",
+		//		},
+		//	},
+		//	"/api/login2",
+		//},
+	})
 	http.ListenAndServe("localhost:9993", nil)
 }

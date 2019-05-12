@@ -19,12 +19,27 @@ type SwaggerParam struct {
 }
 
 type SwaggerApi struct {
-	Param           []SwaggerParam
-	Controller      string
-	Api_description string
-	Path            string
-	Method          string
+	Param                  []SwaggerParam
+	Controller             string
+	Api_description        string
+	Path                   string
+	Method                 string
 	Controller_description string
+}
+
+type ApiKey struct {
+	Type string `yaml:"type"`
+	Name string `yaml:"name"`
+	In   string `yaml:"in"`
+}
+
+type SecurityDefinitionConfig struct {
+	SecurityDefinition
+	Path string   `yaml:"path"`//为 "" 则全部使用 MustKey， 否则 填写具体路径为 具体接口例如 /user  匹配所有/user**
+}
+
+type SecurityDefinition struct {
+	ApiKey ApiKey `yaml:"api_key"`
 }
 
 //扫描上下文生成swagger的yaml
@@ -35,7 +50,7 @@ func ScanControllerContext(config SwaggerConfig) []byte {
 		swaApis = append(swaApis, items...)
 		return true
 	})
-	return CreateSwaggerYaml(swaApis)
+	return CreateSwaggerYaml(swaApis, config)
 }
 
 //扫描一个controller结构体
@@ -164,7 +179,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			api.Method = "get"
 		}
 		api.Api_description = funcField.Tag.Get("doc")
-		api.Controller_description=Controller_description
+		api.Controller_description = Controller_description
 		result = append(result, api)
 	}
 
@@ -182,7 +197,7 @@ func checkHaveRootPath(argType reflect.Type) string {
 	return ""
 }
 
-func CreateSwaggerYaml(arg []SwaggerApi) []byte {
+func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 	root := make(map[interface{}]interface{})
 	var paths = map[interface{}]interface{}{}
 	for _, item := range arg {
@@ -266,6 +281,11 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 		parameters["summary"] = item.Api_description
 		parameters["description"] = item.Api_description
 		parameters["responses"] = map[interface{}]interface{}{200: map[interface{}]interface{}{"description": "OK"}} //不变
+
+		if cfg.SecurityDefinitionConfig!=nil && strings.Contains(item.Path,cfg.SecurityDefinitionConfig.Path){
+			parameters["security"]=[]map[string]interface{}{{"api_key":[]interface{}{}  }}
+		}
+
 		var pet = map[interface{}]interface{}{}
 		pet[item.Method] = parameters
 		paths[item.Path] = pet
@@ -284,6 +304,9 @@ func CreateSwaggerYaml(arg []SwaggerApi) []byte {
 		controllers = append(controllers, map[interface{}]interface{}{"name": item.Controller, "description": item.Controller_description})
 	}
 	root["tags"] = controllers
+
+	root["securityDefinitions"] = cfg.SecurityDefinitionConfig.SecurityDefinition
+
 	d, _ := yaml.Marshal(&root)
 	return d
 }
