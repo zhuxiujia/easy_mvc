@@ -160,7 +160,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
-				Description: noteMap[tagArgs[i]],
+				Description: noteMap[defs[0]],
 				Type:        funcTypeName,
 			}
 			if len(defs) > 1 {
