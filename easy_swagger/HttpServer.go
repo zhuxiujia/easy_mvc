@@ -50,7 +50,7 @@ const htmlTemplete = `<!-- HTML for static distribution bundle build -->
     window.onload = function() {
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "#{serverAddr}",
+        url: window.location.protocol+'//'+window.location.host+"#{serverAddr}",
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -99,7 +99,7 @@ func EnableSwagger(serverAddr string,config SwaggerConfig) {
 	if !strings.Contains(serverAddr, "http://") {
 		serverAddr = "http://" + serverAddr
 	}
-	var h = IndexHtmlHandle{}.New(serverAddr + "/doc")
+	var h = IndexHtmlHandle{}.New(  "/doc")
 	http.Handle("/swagger", &h)
 
 	log.Println("[easy_mvc] swagger ui yaml config on :" + serverAddr + "/doc")
