@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func convert(value string, tItemTypeFieldType reflect.Type, w http.ResponseWriter, r *http.Request) (reflect.Value, error) {
+func convert(value string, tItemTypeFieldType reflect.Type,tag string, w http.ResponseWriter, r *http.Request) (reflect.Value, error) {
 	if tItemTypeFieldType.Kind() == reflect.String {
 		return reflect.ValueOf(value), nil
 	} else {
@@ -64,8 +64,14 @@ func convert(value string, tItemTypeFieldType reflect.Type, w http.ResponseWrite
 					return reflect.Value{}, e
 				}
 				return reflect.ValueOf(newValue), nil
-			} else {
-
+			} else if tItemTypeFieldType.String() == "easy_mvc.MultipartFile" {
+				var f, h, e = r.FormFile(tag)
+				var m = MultipartFile{
+					File:       f,
+					FileHeader: h,
+					Error:      e,
+				}
+				return reflect.ValueOf(m), nil
 			}
 		} else if tItemTypeFieldType.Kind() == reflect.Interface {
 			if tItemTypeFieldType.String() == "http.ResponseWriter" {
@@ -78,7 +84,7 @@ func convert(value string, tItemTypeFieldType reflect.Type, w http.ResponseWrite
 			if value == "" {
 				return reflect.Zero(tItemTypeFieldType), nil
 			}
-			var v, e = convert(value, tItemTypeFieldType.Elem(), w, r)
+			var v, e = convert(value, tItemTypeFieldType.Elem(),tag, w, r)
 			var newPtrV = reflect.New(tItemTypeFieldType.Elem())
 			if v.IsValid() {
 				newPtrV.Elem().Set(v)

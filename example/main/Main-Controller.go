@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/zhuxiujia/easy_mvc"
 	"github.com/zhuxiujia/easy_mvc/easy_swagger"
+	"log"
 	"net/http"
 	"reflect"
 	"strings"
@@ -21,6 +22,7 @@ type TestController struct {
 	Login2 func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"w,r" doc:"登录接口"`
 	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get" doc:"登录接口"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r" doc:"登录接口"`
+	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 
 	UserInfo  func() interface{}                `path:"/api/login2"`
 	UserInfo2 func() (interface{}, interface{}) `path:"/api/login2"`
@@ -28,13 +30,13 @@ type TestController struct {
 
 func (it *TestController) New() {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
-		var ageStr=""
-		if age!=nil{
-			ageStr=fmt.Sprint(*age)
-		}else{
-			ageStr="nil"
+		var ageStr = ""
+		if age != nil {
+			ageStr = fmt.Sprint(*age)
+		} else {
+			ageStr = "nil"
 		}
-		return fmt.Sprint("do Login phone string, pwd string, age *int :",phone,",",pwd,",",ageStr)
+		return fmt.Sprint("do Login phone string, pwd string, age *int :", phone, ",", pwd, ",", ageStr)
 	}
 	it.UserInfo = func() interface{} {
 		return TestUserVO{}
@@ -45,6 +47,14 @@ func (it *TestController) New() {
 	it.Login3 = func(writer http.ResponseWriter, request *http.Request) interface{} {
 
 		return nil
+	}
+	it.Upload = func(file easy_mvc.MultipartFile) interface{} {
+		if file.Error != nil {
+			log.Println("upload success=============", file.Error)
+			return "fail"
+		}
+		log.Println("upload success=============" + file.Filename)
+		return "success"
 	}
 
 	it.Init(&it) //必须初始化，而且是指针
@@ -84,7 +94,7 @@ func main() {
 
 	//可以启动一个swagger api的接口，提供给swagger
 	http.HandleFunc("/doc", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write(easy_swagger.ScanControllerContext())
+		writer.Write(easy_swagger.ScanControllerContext(easy_swagger.SwaggerConfig{}))
 	})
 
 	println("启动成功··")

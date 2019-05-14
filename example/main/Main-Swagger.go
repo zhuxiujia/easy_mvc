@@ -10,7 +10,7 @@ import (
 //type Swagger struct {
 //	paths string `json:"paths"`
 //}
-type TestController struct {
+type TestSwaggerController struct {
 	easy_mvc.Controller `path:"/api" doc:"asdfsad"`
 	//登录接口案例,返回值默认转json，如果要返回其他东西，请在参数里加上 request *http.Request 把content-type 改了，然后可以自行处理（或者直接兼容标准库func(writer http.ResponseWriter, request *http.Request)）
 	Login func(phone string, pwd string, age *int) interface{} `path:"/login" arg:"phone,pwd,age" doc_arg:"phone:手机号,pwd:密码,age:年龄" doc:"登录接口"`
@@ -23,7 +23,7 @@ type TestController struct {
 }
 
 func main() {
-	var controller = TestController{}
+	var controller = TestSwaggerController{}
 	controller.Init(&controller) //初始化
 
 	easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{

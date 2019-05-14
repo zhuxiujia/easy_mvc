@@ -183,9 +183,9 @@ func (it *Controller) Init(arg interface{}) {
 				}
 			}
 
-			if method != ""{
-				if !strings.EqualFold(r.Method,method){
-					w.Write([]byte("[easy_mvc] http method not allow! current use:"+r.Method+"you must use:" + method))
+			if method != "" {
+				if !strings.EqualFold(r.Method, method) {
+					w.Write([]byte("[easy_mvc] http method not allow! current use:" + r.Method + "you must use:" + method))
 					return
 				}
 			}
@@ -195,21 +195,23 @@ func (it *Controller) Init(arg interface{}) {
 				var argItemType = funInTypes[i]
 				var defs = funSplits[i]
 				var httpArg = r.Form.Get(defs[0]) //http arg
-				var convertV, e = convert(httpArg, argItemType, w, r)
+				var convertV, e = convert(httpArg, argItemType, defs[0], w, r)
 				if convertV.IsValid() && e == nil {
-					if argItemType.Kind() == reflect.Ptr && convertV.IsNil() && len(defs) == 2 {
-						convertV, e = convert(defs[1], argItemType, w, r)
-						if e != nil {
-							var errStr = "  error = " + e.Error()
-							w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
-							return
+					if argItemType.Kind() == reflect.Ptr && len(defs) == 2 {
+						if convertV.Kind() == reflect.Ptr && convertV.IsNil() {
+							convertV, e = convert(defs[1], argItemType, defs[0], w, r)
+							if e != nil {
+								var errStr = "  error = " + e.Error()
+								w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
+								return
+							}
 						}
 					}
 					args = append(args, convertV)
 				} else {
 					var convertSuccess *reflect.Value
 					if len(defs) == 2 {
-						convertV, e = convert(defs[1], argItemType, w, r)
+						convertV, e = convert(defs[1], argItemType, defs[0], w, r)
 						if e != nil {
 							var errStr = ""
 							if e != nil {
@@ -250,7 +252,7 @@ func (it *Controller) Init(arg interface{}) {
 				}
 			}
 		}
-		log.Println("[easy_mvc] http.HandleFunc " +argType.String() +"  =>  "+ funcField.Name + " " + funcField.Type.String() + strings.Replace(string(" "+funcField.Tag),funcField.Tag.Get("path"),tagPath,-1))
+		log.Println("[easy_mvc] http.HandleFunc " + argType.String() + "  =>  " + funcField.Name + " " + funcField.Type.String() + strings.Replace(string(" "+funcField.Tag), funcField.Tag.Get("path"), tagPath, -1))
 		http.HandleFunc(tagPath, httpFunc)
 	}
 	//存入上下文
