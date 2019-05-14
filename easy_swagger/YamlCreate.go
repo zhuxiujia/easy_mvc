@@ -107,19 +107,18 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 		}
 
 		var docArg = funcField.Tag.Get("doc_arg")
-		var noteMap = map[string]string{}
-		var notes = strings.Split(docArg, ",")
-		for _, noteItem := range notes {
+		var docMap = map[string]string{}
+		var doc_args = strings.Split(docArg, ",")
+		for _, noteItem := range doc_args {
 			var sp = strings.Split(noteItem, ":")
 			if len(sp) == 2 {
-				noteMap[sp[0]] = sp[1]
+				docMap[sp[0]] = sp[1]
 			} else {
 				if noteItem != "" {
 					panic("[easy_mvc] note \"" + noteItem + "\"must have ':' and  value!")
 				}
 			}
 		}
-
 		var MustKeys []SwaggerParam
 		if config.AppendParam != nil {
 			for _, v := range config.AppendParam {
@@ -160,9 +159,13 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
-				Description: noteMap[defs[0]],
+				Description: docMap[defs[0]],
 				Type:        funcTypeName,
 			}
+			if swaggerParam.Description=="_"{
+				continue
+			}
+
 			if len(defs) > 1 {
 				swaggerParam.Default = defs[1]
 			}
@@ -170,16 +173,6 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 				swaggerParam.Required = false
 			} else {
 				swaggerParam.Required = true
-			}
-			var Continue bool
-			for _, item := range defs {
-				if item == "_" {
-					Continue = true
-					break
-				}
-			}
-			if Continue {
-				continue
 			}
 			api.Param = append(api.Param, swaggerParam)
 		}
