@@ -171,13 +171,14 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			} else {
 				swaggerParam.Required = true
 			}
-			if swaggerParam.Name=="_"{
-				continue
+			var Continue bool
+			for _, item := range defs {
+				if item == "_" {
+					Continue = true
+					break
+				}
 			}
-			if len(defs)>1 && defs[1]=="_"{
-				continue
-			}
-			if len(defs)>2 && defs[2]=="_"{
+			if Continue {
 				continue
 			}
 			api.Param = append(api.Param, swaggerParam)
@@ -314,7 +315,7 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 	}
 	root["tags"] = controllers
 
-	if cfg.SecurityDefinitionConfig!=nil{
+	if cfg.SecurityDefinitionConfig != nil {
 		root["securityDefinitions"] = cfg.SecurityDefinitionConfig.SecurityDefinition
 	}
 
