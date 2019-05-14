@@ -157,11 +157,6 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 				funcTypeName = funcType.Name()
 			}
 			//defs[1] 为默认值
-
-			if len(defs)>1 && defs[1]=="_"{
-				continue
-			}
-
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
@@ -175,6 +170,9 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 				swaggerParam.Required = false
 			} else {
 				swaggerParam.Required = true
+			}
+			if swaggerParam.Name=="_"{
+				continue
 			}
 			api.Param = append(api.Param, swaggerParam)
 		}
@@ -310,7 +308,9 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 	}
 	root["tags"] = controllers
 
-	root["securityDefinitions"] = cfg.SecurityDefinitionConfig.SecurityDefinition
+	if cfg.SecurityDefinitionConfig!=nil{
+		root["securityDefinitions"] = cfg.SecurityDefinitionConfig.SecurityDefinition
+	}
 
 	d, _ := yaml.Marshal(&root)
 	return d
