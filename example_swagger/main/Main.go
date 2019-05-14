@@ -16,7 +16,7 @@ type TestController struct {
 	Login func(phone string, pwd string, age *int) interface{} `path:"/login" arg:"phone,pwd,age" doc_arg:"phone:手机号,pwd:密码,age:年龄" doc:"登录接口"`
 	//兼容go标准库http案例,可以无返回值
 	Login2 func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"_,_"`
-	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get"`
+	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w:_,r:_" method:"get"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r"`
 
 	UserInfo func() interface{} `path:"/api/login5"`

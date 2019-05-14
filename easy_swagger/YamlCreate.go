@@ -174,6 +174,12 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			if swaggerParam.Name=="_"{
 				continue
 			}
+			if len(defs)>1 && defs[1]=="_"{
+				continue
+			}
+			if len(defs)>2 && defs[2]=="_"{
+				continue
+			}
 			api.Param = append(api.Param, swaggerParam)
 		}
 		api.Path = tagPath
