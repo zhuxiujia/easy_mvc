@@ -35,7 +35,7 @@ type ApiKey struct {
 
 type SecurityDefinitionConfig struct {
 	SecurityDefinition
-	Path string   `yaml:"path"`//为 "" 则全部使用 MustKey， 否则 填写具体路径为 具体接口例如 /user  匹配所有/user**
+	Path string `yaml:"path"` //为 "" 则全部使用 MustKey， 否则 填写具体路径为 具体接口例如 /user  匹配所有/user**
 }
 
 type SecurityDefinition struct {
@@ -157,10 +157,14 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 				funcTypeName = funcType.Name()
 			}
 			//defs[1] 为默认值
+			var swaggerParamDescription = noteMap[defs[0]]
+			if swaggerParamDescription == "_" {
+				continue
+			}
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
-				Description: noteMap[defs[0]],
+				Description: swaggerParamDescription,
 				Type:        funcTypeName,
 			}
 			if len(defs) > 1 {
@@ -282,8 +286,8 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 		parameters["description"] = item.Api_description
 		parameters["responses"] = map[interface{}]interface{}{200: map[interface{}]interface{}{"description": "OK"}} //不变
 
-		if cfg.SecurityDefinitionConfig!=nil && strings.Contains(item.Path,cfg.SecurityDefinitionConfig.Path){
-			parameters["security"]=[]map[string]interface{}{{"api_key":[]interface{}{}  }}
+		if cfg.SecurityDefinitionConfig != nil && strings.Contains(item.Path, cfg.SecurityDefinitionConfig.Path) {
+			parameters["security"] = []map[string]interface{}{{"api_key": []interface{}{}}}
 		}
 
 		var pet = map[interface{}]interface{}{}
