@@ -277,7 +277,7 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 				break
 
 			//file
-			case "easy_mvc.MultipartFile":
+			case "MultipartFile":
 				argItem.Type = "file"
 				argItem.In="formData"
 				break
