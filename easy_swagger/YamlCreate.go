@@ -157,14 +157,15 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 				funcTypeName = funcType.Name()
 			}
 			//defs[1] 为默认值
-			var swaggerParamDescription = noteMap[defs[0]]
-			if swaggerParamDescription == "_" {
+
+			if len(defs)>1 && defs[1]=="_"{
 				continue
 			}
+
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
-				Description: swaggerParamDescription,
+				Description: noteMap[defs[0]],
 				Type:        funcTypeName,
 			}
 			if len(defs) > 1 {
