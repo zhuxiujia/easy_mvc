@@ -162,7 +162,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 				Description: docMap[defs[0]],
 				Type:        funcTypeName,
 			}
-			if swaggerParam.Description=="_"{
+			if swaggerParam.Description == "_" {
 				continue
 			}
 
@@ -275,6 +275,13 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 			case "*time.Time":
 				argItem.Type = "string"
 				break
+
+			//file
+			case "easy_mvc.MultipartFile":
+				argItem.Type = "file"
+				argItem.In="formData"
+				break
+
 			}
 			paramter = append(paramter, argItem)
 		}
