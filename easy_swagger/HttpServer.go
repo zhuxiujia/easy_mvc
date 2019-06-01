@@ -14,9 +14,9 @@ const htmlTemplete = `<!-- HTML for static distribution bundle build -->
   <head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
-    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="./swagger_static/swagger-ui.css" >
+    <link rel="icon" type="image/png" href="./swagger_static/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="./swagger_static/favicon-16x16.png" sizes="16x16" />
     <style>
       html
       {
@@ -38,14 +38,14 @@ const htmlTemplete = `<!-- HTML for static distribution bundle build -->
         background: #fafafa;
       }
     </style>
-    <script src="swagger-ui-bundle.js"></script>
+    <script src="/swagger_static/swagger-ui-bundle.js"></script>
   </head>
 
   <body>
     <div id="swagger-ui"></div>
 
-    <script src="./swagger-ui-bundle.js"> </script>
-    <script src="./swagger-ui-standalone-preset.js"> </script>
+    <script src="./swagger_static/swagger-ui-bundle.js"> </script>
+    <script src="./swagger_static/swagger-ui-standalone-preset.js"> </script>
     <script>
     window.onload = function() {
       // Begin Swagger UI call region
@@ -94,7 +94,7 @@ func EnableSwagger(serverAddr string,config SwaggerConfig) {
 	statikFS, _ := fs.New()
 
 	//swagger ui 必须的js文件
-	http.Handle("/", http.FileServer(statikFS))
+	http.Handle("/swagger_static/", http.FileServer(statikFS))
 
 	if !strings.Contains(serverAddr, "http://") {
 		serverAddr = "http://" + serverAddr

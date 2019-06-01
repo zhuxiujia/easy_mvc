@@ -1,7 +1,6 @@
 package easy_swagger
 
 import (
-	"fmt"
 	"github.com/zhuxiujia/easy_mvc"
 	"net/http"
 	"testing"
@@ -21,7 +20,5 @@ type TestController struct {
 }
 
 func TestYaml(t *testing.T) {
-	var c = TestController{}
 
-	fmt.Printf("--- m dump:\n%s\n\n", string(CreateSwaggerYaml(Scan(&c))))
 }
