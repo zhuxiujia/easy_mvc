@@ -202,7 +202,7 @@ func (it *Controller) Init(arg interface{}) {
 							convertV, e = convert(defs[1], argItemType, defs[0], w, r)
 							if e != nil {
 								var errStr = "  error = " + e.Error()
-								w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
+								w.Write([]byte("[easy_mvc] parser http arg fail: path=" + tagPath + ",type=" + argItemType.String() + ",tag=" + tagArgs[i] + ",error=" + errStr))
 								return
 							}
 						}
@@ -217,7 +217,7 @@ func (it *Controller) Init(arg interface{}) {
 							if e != nil {
 								errStr = "  error = " + e.Error()
 							}
-							w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
+							w.Write([]byte("[easy_mvc] parser http arg fail: path=" + tagPath + ",type=" + argItemType.String() + ",tag=" + tagArgs[i] + ",error=" + errStr))
 							return
 						} else {
 							convertSuccess = &convertV
@@ -231,7 +231,7 @@ func (it *Controller) Init(arg interface{}) {
 					if e != nil {
 						errStr = "  error = " + e.Error()
 					}
-					w.Write([]byte("[easy_mvc] parser http arg fail:" + argItemType.String() + ":" + tagArgs[i] + errStr))
+					w.Write([]byte("[easy_mvc] parser http arg fail: path=" + tagPath + ",type=" + argItemType.String() + ",tag=" + tagArgs[i] + ",error=" + errStr))
 					return
 				}
 			}
