@@ -21,7 +21,7 @@ type TestController struct {
 	//兼容go标准库http案例,可以无返回值
 	Login2 func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"w,r" doc:"登录接口"`
 	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get" doc:"登录接口"`
-	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r" doc:"登录接口"`
+	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone:18969542172,pwd,r" doc:"登录接口"`
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 
 	UserInfo  func() interface{}                `path:"/api/login2"`
@@ -47,6 +47,10 @@ func (it *TestController) New() {
 	it.Login3 = func(writer http.ResponseWriter, request *http.Request) interface{} {
 
 		return nil
+	}
+	it.Login4 = func(phone string, pwd string, request *http.Request) interface{} {
+
+		return phone
 	}
 	it.Upload = func(file easy_mvc.MultipartFile) interface{} {
 		if file.Error != nil {

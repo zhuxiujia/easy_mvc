@@ -197,14 +197,16 @@ func (it *Controller) Init(arg interface{}) {
 				var httpArg = r.Form.Get(defs[0]) //http arg
 				var convertV, e = convert(httpArg, argItemType, defs[0], w, r)
 				if convertV.IsValid() && e == nil {
-					if argItemType.Kind() == reflect.Ptr && len(defs) == 2 {
-						if convertV.Kind() == reflect.Ptr && convertV.IsNil() {
+					if len(defs) == 2{
+						if argItemType.Kind() == reflect.Ptr && convertV.IsNil() {
 							convertV, e = convert(defs[1], argItemType, defs[0], w, r)
 							if e != nil {
 								var errStr = "  error = " + e.Error()
 								w.Write([]byte("[easy_mvc] parser http arg fail: path=" + tagPath + ",type=" + argItemType.String() + ",tag=" + tagArgs[i] + ",error=" + errStr))
 								return
 							}
+						} else if argItemType.Kind() == reflect.String {
+							convertV = reflect.ValueOf(defs[1])
 						}
 					}
 					args = append(args, convertV)
