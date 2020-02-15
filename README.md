@@ -15,7 +15,7 @@
 
 
 ## Controller
-```
+``` go
 import (
 	"errors"
 	"github.com/zhuxiujia/easy_mvc"
