@@ -110,7 +110,7 @@ func main() {
 ```
 
 * 启动Main-Controller.go 后即可在日志查看 具体挂载的http接口地址，例如上面定义的/login2 挂载为(基地址+具体接口地址) 如 /api/login2
-* 也可以执行Main-Swagger.go,即可在localhost:9993 查看swagger ui接口地址
+
 ``` log
 2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login func(string, string, *int) interface {} method:"get" path:"/api/login" arg:"phone,pwd,age" doc:"登录接口" doc_arg:"phone:手机号,pwd:密码,age:年龄"
 2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login2 func(http.ResponseWriter, *http.Request) path:"/api/login2" arg:"w,r" doc:"登录接口"
@@ -121,4 +121,19 @@ func main() {
 2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  UserInfo func() interface {} path:"/api/api/login2"
 2020/02/22 00:42:55 [easy_rpc] warning not registed !============= UserInfo2 func() (interface {}, interface {}) func return num > 1 
 服务启动于  127.0.0.1:8080
+```
+* 也可以EnableSwagger允许swagger ui即可在localhost:9993 查看swagger ui接口,代码查看Main-Swagger.go,
+``` log
+easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{
+		//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{
+		//	easy_swagger.SecurityDefinition{
+		//		ApiKey: easy_swagger.ApiKey{
+		//			Type: "apiKey",
+		//			Name: "access_token",
+		//			In:   "query",
+		//		},
+		//	},
+		//	"/api/login2",
+		//},
+	})
 ```
