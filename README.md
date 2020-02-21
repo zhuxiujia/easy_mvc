@@ -111,7 +111,7 @@ func main() {
 
 * 启动Main-Controller.go 后即可在日志查看 具体挂载的http接口地址，例如上面定义的/login2 挂载为(基地址+具体接口地址) 如 /api/login2
 * 也可以执行Main-Swagger.go,即可在localhost:9993 查看swagger ui接口地址
-``` go
+``` log
 2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login func(string, string, *int) interface {} method:"get" path:"/api/login" arg:"phone,pwd,age" doc:"登录接口" doc_arg:"phone:手机号,pwd:密码,age:年龄"
 2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login2 func(http.ResponseWriter, *http.Request) path:"/api/login2" arg:"w,r" doc:"登录接口"
 2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login3 func(http.ResponseWriter, *http.Request) interface {} path:"/api/login3" arg:"w,r" method:"get" doc:"登录接口"
