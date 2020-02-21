@@ -24,7 +24,7 @@ type TestController struct {
 	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get" doc:"登录接口"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone:18969542172,pwd,r" doc:"登录接口"`
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
-	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据参数"`
+	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
 	UserInfo  func() interface{}                `path:"/api/login2"`
 	UserInfo2 func() (interface{}, interface{}) `path:"/api/login2"`
@@ -113,7 +113,7 @@ func main() {
 		writer.Write(easy_swagger.ScanControllerContext(easy_swagger.SwaggerConfig{}))
 	})
 
-	println("启动 ","127.0.0.1:8080")
+	println("服务启动于 ","127.0.0.1:8080")
 	//使用标准库启动http
 	http.ListenAndServe("127.0.0.1:8080", nil)
 }

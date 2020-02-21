@@ -8,6 +8,7 @@
 * 过滤器 支持
 * 全局错误处理器链 支持
 * 使用tag 定义 http请求参数，包含 *int,*string,*float 同时支持标准库的 writer http.ResponseWriter, request *http.Request
+* Json参数支持（app端上传时需要Header，Content-Type设置为application/json）
 * 支持参数默认值 只需在tag中 定义，例如 func(phone string, pwd string, age *int) interface{} arg:"phone,pwd,age:1"  其中 arg没有传参则默认为1
 * 指针参数可为空（nil）非指针参数 如果没有值框架会拦截
 * root path支持，类似spring controller定义一个基础的path加控制器具体方法的http path
@@ -29,13 +30,14 @@ type TestUserVO struct {
 }
 
 type TestController struct {
-	easy_mvc.Controller `path:"/api"`
+	easy_mvc.Controller `path:"/api"`         //基路由
 	//登录接口案例,返回值默认转json，如果要返回其他东西，请在参数里加上 request *http.Request 把content-type 改了，然后可以自行处理（或者直接兼容标准库func(writer http.ResponseWriter, request *http.Request)）
 	Login func(phone string, pwd string, age *int) interface{} `path:"/login" arg:"phone,pwd,age" doc_arg:"phone:手机号,pwd:密码,age:年龄"`
 	//兼容go标准库http案例,可以无返回值
 	Login2 func(writer http.ResponseWriter, request *http.Request)             `path:"/login2" arg:"w,r"`
 	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r"`
+	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
 	UserInfo  func() interface{}                `path:"/api/login2"`
 }
@@ -54,6 +56,15 @@ func (it *TestController) New() {
 	it.Login3 = func(writer http.ResponseWriter, request *http.Request) interface{} {
 
 		return nil
+	}
+    it.Json = func(js string) interface{} {
+		var m = map[string]interface{}{}
+		json.Unmarshal([]byte(js), &m)
+		for k,v := range m {
+			println("json_key:",k)
+			println("json_value:",fmt.Sprint(v))
+		}
+		return js
 	}
 
 	it.Init(&it) //必须初始化，而且是指针
@@ -91,7 +102,8 @@ func main() {
 		writer.Write([]byte("yes"))
 	})
 
-	println("启动成功··")
+	println("服务启动于 ","127.0.0.1:8080")
+
 	//使用标准库启动http
 	http.ListenAndServe("127.0.0.1:8080", nil)
 }
