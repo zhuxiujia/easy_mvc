@@ -108,3 +108,17 @@ func main() {
 	http.ListenAndServe("127.0.0.1:8080", nil)
 }
 ```
+
+* 启动Main-Controller.go 后即可在日志查看 具体挂载的http接口地址，例如上面定义的/login2 挂载为(基地址+具体接口地址) 如 /api/login2
+* 也可以执行Main-Swagger.go,即可在localhost:9993 查看swagger ui接口地址
+``` go
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login func(string, string, *int) interface {} method:"get" path:"/api/login" arg:"phone,pwd,age" doc:"登录接口" doc_arg:"phone:手机号,pwd:密码,age:年龄"
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login2 func(http.ResponseWriter, *http.Request) path:"/api/login2" arg:"w,r" doc:"登录接口"
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login3 func(http.ResponseWriter, *http.Request) interface {} path:"/api/login3" arg:"w,r" method:"get" doc:"登录接口"
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Login4 func(string, string, *http.Request) interface {} path:"/api/login4" arg:"phone:18969542172,pwd,r" doc:"登录接口"
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Upload func(easy_mvc.MultipartFile) interface {} path:"/api/upload" arg:"file" doc:"文件上传"
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  Json func(string) interface {} path:"/api/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/api/json"
+2020/02/22 00:42:55 [easy_mvc] http.HandleFunc main.TestController  =>  UserInfo func() interface {} path:"/api/api/login2"
+2020/02/22 00:42:55 [easy_rpc] warning not registed !============= UserInfo2 func() (interface {}, interface {}) func return num > 1 
+服务启动于  127.0.0.1:8080
+```
