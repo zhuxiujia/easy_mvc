@@ -3,12 +3,15 @@ package easy_mvc
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"reflect"
 	"runtime"
 	"strings"
 )
+
+const ContentType  = "Content-Type"
 
 type HttpChan struct {
 	Func func(path string, w http.ResponseWriter, r *http.Request) bool //函数返回error则中断执行
@@ -89,7 +92,7 @@ func RegisterGlobalHttpChan(handle *HttpChan) {
 func init() {
 	var defHttpHandle = HttpChan{
 		Func: func(path string, w http.ResponseWriter, r *http.Request) bool {
-			w.Header().Set("Content-type", "application/json") //框架默认使用json处理结果
+			w.Header().Set(ContentType, "application/json") //框架默认使用json处理结果
 			return false
 		},
 		Name: "DefHttpHandle",
@@ -174,7 +177,6 @@ func (it *Controller) Init(arg interface{}) {
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
 			//default param
-			r.ParseForm()
 			defer GlobalErrorHandle(w, r)
 			//chan
 			for _, v := range GlobalHttpChan {
@@ -194,10 +196,26 @@ func (it *Controller) Init(arg interface{}) {
 			for i := 0; i < len(funInTypes); i++ {
 				var argItemType = funInTypes[i]
 				var defs = funSplits[i]
-				var httpArg = r.Form.Get(defs[0]) //http arg
+
+				var httpArg = "" //http arg
+				//JsonArg
+				var req_content = r.Header.Get(ContentType)
+				if req_content == "application/json" {
+					b, err := ioutil.ReadAll(r.Body)
+					if err!=nil{
+						var errStr = "  error = " + err.Error()
+						w.Write([]byte("[easy_mvc] parser http arg fail: path=" + tagPath + ",type=" + argItemType.String() + ",tag=" + tagArgs[i] + ",error=" + errStr))
+						return
+					}
+					httpArg = string(b)
+				} else {
+					r.ParseForm()
+					httpArg = r.Form.Get(defs[0]) //http arg
+				}
+				//FormArg
 				var convertV, e = convert(httpArg, argItemType, defs[0], w, r)
 				if convertV.IsValid() && e == nil {
-					if len(defs) == 2{
+					if len(defs) == 2 {
 						if argItemType.Kind() == reflect.Ptr && convertV.IsNil() {
 							convertV, e = convert(defs[1], argItemType, defs[0], w, r)
 							if e != nil {
@@ -238,7 +256,7 @@ func (it *Controller) Init(arg interface{}) {
 				}
 			}
 			var results = field.Call(args)
-			var contentType = w.Header().Get("Content-type")
+			var contentType = w.Header().Get("Content-Type")
 			if results != nil && len(results) > 0 {
 				switch contentType {
 				case "application/json":
