@@ -105,7 +105,7 @@ func main() {
 
 	//你也可以使用标准库的api（使用标准库不经过easy_mvc）
 	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("yes"))
+		writer.Write([]byte("in root path/"))
 	})
 
 	//可以启动一个swagger api的接口，提供给swagger
