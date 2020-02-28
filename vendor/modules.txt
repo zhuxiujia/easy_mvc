@@ -1,0 +1,20 @@
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+# github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c
+## explicit
+# github.com/facebookgo/inject v0.0.0-20180706035515-f23751cae28b
+## explicit
+github.com/facebookgo/inject
+# github.com/facebookgo/stack v0.0.0-20160209184415-751773369052
+## explicit
+# github.com/facebookgo/structtag v0.0.0-20150214074306-217e25fb9691
+## explicit
+github.com/facebookgo/structtag
+# github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4
+## explicit
+# github.com/rakyll/statik v0.1.4
+## explicit
+github.com/rakyll/statik/fs
+# gopkg.in/yaml.v2 v2.2.8
+## explicit
+gopkg.in/yaml.v2
