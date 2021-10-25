@@ -20,7 +20,8 @@ type TestSwaggerController struct {
 	Login3 func(writer http.ResponseWriter, request *http.Request) interface{} `path:"/login3" arg:"w,r" method:"get" doc_arg:"w:_,r:_"`
 	Login4 func(phone string, pwd string, request *http.Request) interface{}   `path:"/login4" arg:"phone,pwd,r"`
 
-	UserInfo func(phone string, test bool) interface{} `path:"/api/login2" method:"post"  arg:"phone,test" doc_arg:"phone:手机号,test:测试bool" doc:"信息接口"`
+	UserInfo  func(phone string, test bool) interface{} `path:"/api/login2" method:"post"  arg:"phone,test" doc_arg:"phone:手机号,test:测试bool" doc:"信息接口"`
+	UserInfo2 func(request *http.Request) interface{}   `path:"/api/login2/{name}" method:"get" arg:"r" doc_arg:"name:姓名"` //path参数
 }
 
 func main() {
