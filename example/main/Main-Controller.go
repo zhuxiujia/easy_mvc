@@ -27,7 +27,7 @@ type TestController struct {
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
 	UserInfo  func() interface{} `path:"/api/login2" method:"post"`
-	UserInfo2 func() interface{} `path:"/api/login2/{name}" method:"get"`
+	UserInfo2 func() interface{} `path:"/api/login2/{name}" method:"get"` //TODO 待实现
 }
 
 func (it *TestController) New() {
