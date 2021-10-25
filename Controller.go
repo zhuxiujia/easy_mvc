@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const ContentType  = "Content-Type"
+const ContentType = "Content-Type"
 
 type HttpChan struct {
 	Func func(path string, w http.ResponseWriter, r *http.Request) bool //函数返回error则中断执行
@@ -121,6 +121,9 @@ func init() {
 type Controller struct {
 }
 
+var targetPaths = map[string]func(w http.ResponseWriter, r *http.Request){}
+var pathMethods = map[string]bool{}
+
 func (it *Controller) Init(arg interface{}) {
 	var argV = reflect.ValueOf(arg)
 	if argV.Kind() != reflect.Ptr {
@@ -173,7 +176,12 @@ func (it *Controller) Init(arg interface{}) {
 			funSplits = append(funSplits, defs)
 		}
 		var method = funcField.Tag.Get("method")
-
+		//check repeat method
+		var have = pathMethods[tagPath+method]
+		if have == true {
+			panic(fmt.Sprint("[easy_mvc] find repeat method of ", tagPath))
+		}
+		pathMethods[tagPath+method] = true
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
 			//default param
@@ -202,7 +210,7 @@ func (it *Controller) Init(arg interface{}) {
 				var req_content = r.Header.Get(ContentType)
 				if req_content == "application/json" {
 					b, err := ioutil.ReadAll(r.Body)
-					if err!=nil{
+					if err != nil {
 						var errStr = "  error = " + err.Error()
 						w.Write([]byte("[easy_mvc] parser http arg fail: path=" + tagPath + ",type=" + argItemType.String() + ",tag=" + tagArgs[i] + ",error=" + errStr))
 						return
@@ -273,7 +281,21 @@ func (it *Controller) Init(arg interface{}) {
 			}
 		}
 		log.Println("[easy_mvc] http.HandleFunc " + argType.String() + "  =>  " + funcField.Name + " " + funcField.Type.String() + strings.Replace(string(" "+funcField.Tag), funcField.Tag.Get("path"), tagPath, -1))
-		http.HandleFunc(tagPath, httpFunc)
+		var oldPath = targetPaths[tagPath]
+		if oldPath == nil {
+			oldPath = func(w http.ResponseWriter, r *http.Request) {
+				httpFunc(w, r)
+			}
+		} else {
+			oldPath = func(w http.ResponseWriter, r *http.Request) {
+				oldPath(w, r)
+				httpFunc(w, r)
+			}
+		}
+		targetPaths[tagPath] = oldPath
+	}
+	for path, _ := range targetPaths {
+		http.HandleFunc(path, targetPaths[path])
 	}
 	//存入上下文
 	ControllerTable.Store(argType.Name(), arg)

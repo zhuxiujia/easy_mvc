@@ -26,8 +26,8 @@ type TestController struct {
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
-	UserInfo  func() interface{}                `path:"/api/login2"`
-	UserInfo2 func() (interface{}, interface{}) `path:"/api/login2"`
+	UserInfo  func() interface{} `path:"/api/login2"`
+	UserInfo2 func() interface{} `path:"/api/login2" method:"get"`
 }
 
 func (it *TestController) New() {
@@ -66,9 +66,9 @@ func (it *TestController) New() {
 	it.Json = func(js string) interface{} {
 		var m = map[string]interface{}{}
 		json.Unmarshal([]byte(js), &m)
-		for k,v := range m {
-			println("json_key:",k)
-			println("json_value:",fmt.Sprint(v))
+		for k, v := range m {
+			println("json_key:", k)
+			println("json_value:", fmt.Sprint(v))
 		}
 		return js
 	}
@@ -113,7 +113,7 @@ func main() {
 		writer.Write(easy_swagger.ScanControllerContext(easy_swagger.SwaggerConfig{}))
 	})
 
-	println("服务启动于 ","127.0.0.1:8080")
+	println("服务启动于 ", "127.0.0.1:8080")
 	//使用标准库启动http
 	http.ListenAndServe("127.0.0.1:8080", nil)
 }
