@@ -28,7 +28,7 @@ type TestController struct {
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
 	UserInfo  func() interface{}                                   `path:"/api/login2" method:"post"`
-	UserInfo2 func(name string, request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"name,r"` //path参数
+	UserInfo2 func(name string, request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"name,r"  doc_arg:"name:姓名"` //path参数
 }
 
 func (it *TestController) New(router *mux.Router) {
