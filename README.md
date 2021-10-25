@@ -122,9 +122,9 @@ func main() {
 2020/02/22 00:42:55 [easy_rpc] warning not registed !============= UserInfo2 func() (interface {}, interface {}) func return num > 1 
 服务启动于  127.0.0.1:8080
 ```
-* 也可以EnableSwagger允许swagger ui即可在localhost:9993 查看swagger ui接口,代码查看Main-Swagger.go,
+* 也可以EnableSwagger允许swagger ui即可在localhost:8080 查看swagger ui接口,代码查看Main-Swagger.go,
 ``` log
-easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{
+easy_swagger.EnableSwagger("localhost:8080", easy_swagger.SwaggerConfig{
 		//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{
 		//	easy_swagger.SecurityDefinition{
 		//		ApiKey: easy_swagger.ApiKey{
