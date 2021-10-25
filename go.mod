@@ -9,6 +9,7 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/structtag v0.0.0-20150214074306-217e25fb9691 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
+	github.com/gorilla/mux v1.8.0
 	github.com/rakyll/statik v0.1.7
 	gopkg.in/yaml.v2 v2.2.8
 )

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"github.com/zhuxiujia/easy_mvc"
 	"github.com/zhuxiujia/easy_mvc/easy_swagger"
 	"log"
@@ -10,6 +11,9 @@ import (
 	"reflect"
 	"strings"
 )
+
+//first define router
+var Router = mux.Router{}
 
 type TestUserVO struct {
 	Name string
@@ -75,7 +79,7 @@ func (it *TestController) New() {
 		return js
 	}
 
-	it.Init(&it) //必须初始化，而且是指针
+	it.Init(&it, &Router) //必须初始化，而且是指针
 }
 
 func main() {
@@ -105,9 +109,11 @@ func main() {
 	var testController = TestController{}
 	testController.New()
 
-	//你也可以使用标准库的api（使用标准库不经过easy_mvc）
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("in root path/"))
+	//首先，初始化路由
+	http.Handle("/", &Router)
+
+	Router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		writer.Write([]byte("this is /"))
 	})
 
 	//可以启动一个swagger api的接口，提供给swagger

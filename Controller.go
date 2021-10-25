@@ -3,6 +3,7 @@ package easy_mvc
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -118,12 +119,11 @@ func init() {
 
 //例如 SendSms(writer http.ResponseWriter, request *http.Request)  `path:"/" arg:"w,r" `
 //模板 `path:"" arg:"" `
-type Controller struct {
-}
+type Controller struct{}
 
 var pathMethods = map[string]bool{}
 
-func (it *Controller) Init(arg interface{}) {
+func (it *Controller) Init(arg interface{}, router *mux.Router) {
 	var argV = reflect.ValueOf(arg)
 	if argV.Kind() != reflect.Ptr {
 		panic("[easy_mvc] Init value " + argV.String() + " must be struct{} ptr!")
@@ -290,10 +290,10 @@ func (it *Controller) Init(arg interface{}) {
 		log.Println("[easy_mvc] http.HandleFunc " + argType.String() + "  =>  " + funcField.Name + " " + funcField.Type.String() + strings.Replace(string(" "+funcField.Tag), funcField.Tag.Get("path"), tagPath, -1))
 
 		var basePath = tagPath
-		var idx = strings.Index(tagPath, "/{")
-		if idx != -1 {
-			basePath = tagPath[:idx]
-		}
+		//var idx = strings.Index(tagPath, "/{")
+		//if idx != -1 {
+		//	basePath = tagPath[:idx]
+		//}
 		var fns = handleFuncs[basePath]
 		if fns == nil {
 			fns = &[]Func{}
@@ -306,24 +306,21 @@ func (it *Controller) Init(arg interface{}) {
 		handleFuncs[basePath] = fns
 		println("base:", basePath)
 	}
+
 	for _path, _fs := range handleFuncs {
 		var path = _path
 		var fs = _fs
-		if len(*fs) > 1 {
-			path = path + "/"
-		}
-		http.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
+		router.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
 			for _, f := range *fs {
-				if f.Method == "" {
+				if request.Method == strings.ToUpper(f.Method) {
 					(f.Fn)(writer, request)
 					return
-				} else {
-					if request.Method == f.Method || request.Method == strings.ToUpper(f.Method) {
-						(f.Fn)(writer, request)
-						return
-					}
+				} else if f.Method == "" {
+					(f.Fn)(writer, request)
+					return
 				}
 			}
+			writer.WriteHeader(404)
 		})
 	}
 	//存入上下文
