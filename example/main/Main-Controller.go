@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/zhuxiujia/easy_mvc"
+	"github.com/zhuxiujia/easy_mvc/easy_swagger"
 	"log"
 	"net/http"
 	"reflect"
@@ -121,18 +122,18 @@ func main() {
 	//})
 
 	//启用swagger ui 前端界面
-	//easy_swagger.EnableSwagger("localhost:8080", easy_swagger.SwaggerConfig{
-	//	//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{
-	//	//	easy_swagger.SecurityDefinition{
-	//	//		ApiKey: easy_swagger.ApiKey{
-	//	//			Type: "apiKey",
-	//	//			Name: "access_token",
-	//	//			In:   "query",
-	//	//		},
-	//	//	},
-	//	//	"/api/login2",
-	//	//},
-	//})
+	easy_swagger.EnableSwagger("localhost:8080", easy_swagger.SwaggerConfig{
+		//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{
+		//	easy_swagger.SecurityDefinition{
+		//		ApiKey: easy_swagger.ApiKey{
+		//			Type: "apiKey",
+		//			Name: "access_token",
+		//			In:   "query",
+		//		},
+		//	},
+		//	"/api/login2",
+		//},
+	})
 
 	println("服务启动于 ", "127.0.0.1:8080")
 	//使用标准库启动http

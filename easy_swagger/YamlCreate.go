@@ -136,7 +136,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			MustKeysLen = len(MustKeys)
 		}
 
-		var pathArgs = map[string]bool{}
+		var pathArgs = map[string]*SwaggerParam{}
 		//反射path参数类型
 		var paths = strings.Split(tagPath, "/")
 		for _, v := range paths {
@@ -151,7 +151,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 					Type:        "string",
 				}
 				api.Param = append(api.Param, swaggerParam)
-				pathArgs[v] = true
+				pathArgs[v] = &swaggerParam
 			}
 		}
 
@@ -177,15 +177,18 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 			if funcTypeName == "Request" || funcTypeName == "ResponseWriter" {
 				continue
 			}
+			var pathDoc = pathArgs[defs[0]]
+			if pathDoc != nil {
+				//修改type
+				pathDoc.Type = funcTypeName
+				continue
+			}
 			//defs[1] 为默认值
 			var swaggerParam = SwaggerParam{
 				Name:        defs[0],
 				In:          "query",
 				Description: docMap[defs[0]],
 				Type:        funcTypeName,
-			}
-			if pathArgs[defs[0]] {
-				continue
 			}
 			if swaggerParam.Description == "_" {
 				continue
