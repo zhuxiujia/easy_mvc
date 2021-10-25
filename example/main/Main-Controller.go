@@ -45,8 +45,6 @@ func (it *TestController) New(router *mux.Router) {
 		return TestUserVO{Name: "UserInfo"}
 	}
 	it.UserInfo2 = func(name string, r *http.Request) interface{} {
-		//vars := mux.Vars(r)
-		//name := vars["name"]
 		return TestUserVO{Name: "UserInfo2,name=" + name}
 	}
 	it.Login2 = func(writer http.ResponseWriter, request *http.Request) {

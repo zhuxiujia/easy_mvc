@@ -189,6 +189,14 @@ func (it *Controller) Init(arg interface{}, router *mux.Router) {
 			panic(fmt.Sprint("[easy_mvc] find repeat method of ", tagPath))
 		}
 		pathMethods[tagPath+method] = true
+
+		var pathArgs = []string{}
+		for _, v := range tagArgs {
+			if strings.Index(tagPath, fmt.Sprint("{", v, "}")) != -1 {
+				pathArgs = append(pathArgs, v)
+			}
+		}
+
 		//decode http func
 		var httpFunc = func(w http.ResponseWriter, r *http.Request) {
 			//default param
@@ -226,6 +234,16 @@ func (it *Controller) Init(arg interface{}, router *mux.Router) {
 				} else {
 					r.ParseForm()
 					httpArg = r.Form.Get(defs[0]) //http arg
+				}
+				//Path Arg
+				if len(pathArgs) != 0 {
+					vars := mux.Vars(r)
+					for _, v := range pathArgs {
+						if v == defs[0] {
+							httpArg = vars[v]
+							break
+						}
+					}
 				}
 				//FormArg
 				var convertV, e = convert(httpArg, argItemType, defs[0], w, r)
