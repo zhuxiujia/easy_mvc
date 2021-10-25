@@ -230,7 +230,7 @@ func checkHaveRootPath(argType reflect.Type) string {
 
 func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 	root := make(map[interface{}]interface{})
-	var paths = map[interface{}]interface{}{}
+	var paths = map[interface{}]map[interface{}]interface{}{}
 	for _, item := range arg {
 		var paramter = []SwaggerParam{}
 		for _, argItem := range item.Param {
@@ -329,8 +329,10 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 		if cfg.SecurityDefinitionConfig != nil && strings.Contains(item.Path, cfg.SecurityDefinitionConfig.Path) {
 			parameters["security"] = []map[string]interface{}{{"api_key": []interface{}{}}}
 		}
-
-		var pet = map[interface{}]interface{}{}
+		var pet = paths[item.Path]
+		if pet == nil {
+			pet = map[interface{}]interface{}{}
+		}
 		pet[item.Method] = parameters
 		paths[item.Path] = pet
 	}

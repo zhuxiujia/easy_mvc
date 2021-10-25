@@ -27,8 +27,9 @@ type TestController struct {
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
-	UserInfo  func() interface{}                                   `path:"/api/login2" method:"post"`
-	UserInfo2 func(name string, request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"name,r"  doc_arg:"name:姓名"` //path参数
+	UserInfoGet func() interface{}                                   `path:"/api/login2" method:"get"`
+	UserInfo    func() interface{}                                   `path:"/api/login2" method:"post"`
+	UserInfo2   func(name string, request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"name,r"  doc_arg:"name:姓名"` //path参数
 }
 
 func (it *TestController) New(router *mux.Router) {
@@ -40,6 +41,9 @@ func (it *TestController) New(router *mux.Router) {
 			ageStr = "nil"
 		}
 		return fmt.Sprint("do Login phone string, pwd string, age *int :", phone, ",", pwd, ",", ageStr)
+	}
+	it.UserInfoGet = func() interface{} {
+		return TestUserVO{Name: "UserInfoGet"}
 	}
 	it.UserInfo = func() interface{} {
 		return TestUserVO{Name: "UserInfo"}
