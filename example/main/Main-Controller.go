@@ -30,8 +30,8 @@ type TestController struct {
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
-	UserInfo  func() interface{} `path:"/api/login2" method:"post"`
-	UserInfo2 func() interface{} `path:"/api/login2/{name}" method:"get"` //TODO 待实现
+	UserInfo  func() interface{}                      `path:"/api/login2" method:"post"`
+	UserInfo2 func(request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"r"` //path参数
 }
 
 func (it *TestController) New() {
@@ -47,8 +47,10 @@ func (it *TestController) New() {
 	it.UserInfo = func() interface{} {
 		return TestUserVO{Name: "UserInfo"}
 	}
-	it.UserInfo2 = func() interface{} {
-		return TestUserVO{Name: "UserInfo2"}
+	it.UserInfo2 = func(r *http.Request) interface{} {
+		vars := mux.Vars(r)
+		name := vars["name"]
+		return TestUserVO{Name: "UserInfo2,name=" + name}
 	}
 	it.Login2 = func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("Login2"))
