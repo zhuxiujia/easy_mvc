@@ -195,7 +195,7 @@ func (it *Controller) Init(arg interface{}) {
 
 			if method != "" {
 				if !strings.EqualFold(r.Method, method) {
-					w.Write([]byte("[easy_mvc] http method not allow! current use:" + r.Method + "you must use:" + method))
+					//w.Write([]byte("[easy_mvc] http method not allow! current use:" + r.Method + "you must use:" + method))
 					return
 				}
 			}
