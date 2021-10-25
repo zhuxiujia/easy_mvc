@@ -23,12 +23,12 @@ type TestSwaggerController struct {
 	UserInfo func(phone string, test bool) interface{} `path:"/api/login2" method:"post"  arg:"phone,test" doc_arg:"phone:手机号,test:测试bool" doc:"信息接口"`
 }
 
-//first define router
-var Router = mux.Router{}
-
 func main() {
+	//first define router
+	var router = mux.Router{}
+
 	var controller = TestSwaggerController{}
-	controller.Init(&controller, &Router) //初始化
+	controller.Init(&controller, &router) //初始化
 
 	easy_swagger.EnableSwagger("localhost:9993", easy_swagger.SwaggerConfig{
 		//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{

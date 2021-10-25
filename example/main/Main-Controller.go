@@ -12,9 +12,6 @@ import (
 	"strings"
 )
 
-//first define router
-var Router = mux.Router{}
-
 type TestUserVO struct {
 	Name string
 }
@@ -34,7 +31,7 @@ type TestController struct {
 	UserInfo2 func(request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"r"` //path参数
 }
 
-func (it *TestController) New() {
+func (it *TestController) New(router *mux.Router) {
 	it.Login = func(phone string, pwd string, age *int) interface{} {
 		var ageStr = ""
 		if age != nil {
@@ -81,10 +78,15 @@ func (it *TestController) New() {
 		return js
 	}
 
-	it.Init(&it, &Router) //必须初始化，而且是指针
+	it.Init(&it, router) //必须初始化，而且是指针
 }
 
 func main() {
+	//first define router
+	//首先，初始化路由
+	var router = mux.Router{}
+	http.Handle("/", &router)
+
 	//自定义一个全局错误处理器 到调用链中
 	easy_mvc.RegisterGlobalErrorHandleChan(&easy_mvc.HttpErrorHandle{
 		Func: func(err interface{}, w http.ResponseWriter, r *http.Request) {
@@ -109,12 +111,9 @@ func main() {
 
 	//初始化 控制器
 	var testController = TestController{}
-	testController.New()
+	testController.New(&router)
 
-	//首先，初始化路由
-	http.Handle("/", &Router)
-
-	Router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+	router.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("this is /"))
 	})
 
