@@ -27,7 +27,7 @@ type TestController struct {
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
 	UserInfo  func() interface{} `path:"/api/login2" method:"post"`
-	UserInfo2 func() interface{} `path:"/api/login2" method:"get"`
+	UserInfo2 func() interface{} `path:"/api/login2/{name}" method:"get"`
 }
 
 func (it *TestController) New() {
@@ -47,15 +47,14 @@ func (it *TestController) New() {
 		return TestUserVO{Name: "UserInfo2"}
 	}
 	it.Login2 = func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write([]byte("fuck"))
+		writer.Write([]byte("Login2"))
 	}
 	it.Login3 = func(writer http.ResponseWriter, request *http.Request) interface{} {
-
+		writer.Write([]byte("Login3"))
 		return nil
 	}
 	it.Login4 = func(phone string, pwd string, request *http.Request) interface{} {
-
-		return phone
+		return "Login4:" + phone
 	}
 	it.Upload = func(file easy_mvc.MultipartFile) interface{} {
 		if file.Error != nil {
