@@ -141,7 +141,7 @@ func Scan(arg interface{}, config SwaggerConfig) []SwaggerApi {
 		for i := 0; i < funcField.Type.NumIn()+MustKeysLen; i++ {
 
 			if (i + 1) > funcField.Type.NumIn() {
-				api.Param = append(api.Param, MustKeys[(i - funcField.Type.NumIn())])
+				api.Param = append(api.Param, MustKeys[(i-funcField.Type.NumIn())])
 				continue
 			}
 
@@ -237,6 +237,9 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 			case "float64":
 				argItem.Type = "number"
 				break
+			case "bool":
+				argItem.Type = "boolean"
+				break
 			case "time.Time":
 				argItem.Type = "string"
 				break
@@ -272,6 +275,9 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 			case "*float64":
 				argItem.Type = "number"
 				break
+			case "*bool":
+				argItem.Type = "boolean"
+				break
 			case "*time.Time":
 				argItem.Type = "string"
 				break
@@ -279,7 +285,7 @@ func CreateSwaggerYaml(arg []SwaggerApi, cfg SwaggerConfig) []byte {
 			//file
 			case "MultipartFile":
 				argItem.Type = "file"
-				argItem.In="formData"
+				argItem.In = "formData"
 				break
 
 			}
