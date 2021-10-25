@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/zhuxiujia/easy_mvc"
-	"github.com/zhuxiujia/easy_mvc/easy_swagger"
 	"log"
 	"net/http"
 	"reflect"
@@ -27,8 +26,8 @@ type TestController struct {
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
-	UserInfo  func() interface{}                      `path:"/api/login2" method:"post"`
-	UserInfo2 func(request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"r"` //path参数
+	UserInfo  func() interface{}                                   `path:"/api/login2" method:"post"`
+	UserInfo2 func(name string, request *http.Request) interface{} `path:"/api/login2/{name}" method:"get" arg:"name,r"` //path参数
 }
 
 func (it *TestController) New(router *mux.Router) {
@@ -44,9 +43,9 @@ func (it *TestController) New(router *mux.Router) {
 	it.UserInfo = func() interface{} {
 		return TestUserVO{Name: "UserInfo"}
 	}
-	it.UserInfo2 = func(r *http.Request) interface{} {
-		vars := mux.Vars(r)
-		name := vars["name"]
+	it.UserInfo2 = func(name string, r *http.Request) interface{} {
+		//vars := mux.Vars(r)
+		//name := vars["name"]
 		return TestUserVO{Name: "UserInfo2,name=" + name}
 	}
 	it.Login2 = func(writer http.ResponseWriter, request *http.Request) {
@@ -117,10 +116,23 @@ func main() {
 		writer.Write([]byte("this is /"))
 	})
 
-	//可以启动一个swagger api的接口，提供给swagger
-	http.HandleFunc("/doc", func(writer http.ResponseWriter, request *http.Request) {
-		writer.Write(easy_swagger.ScanControllerContext(easy_swagger.SwaggerConfig{}))
-	})
+	//http.HandleFunc("/doc", func(writer http.ResponseWriter, request *http.Request) {
+	//	writer.Write(easy_swagger.ScanControllerContext(easy_swagger.SwaggerConfig{}))
+	//})
+
+	//启用swagger ui 前端界面
+	//easy_swagger.EnableSwagger("localhost:8080", easy_swagger.SwaggerConfig{
+	//	//SecurityDefinitionConfig: &easy_swagger.SecurityDefinitionConfig{
+	//	//	easy_swagger.SecurityDefinition{
+	//	//		ApiKey: easy_swagger.ApiKey{
+	//	//			Type: "apiKey",
+	//	//			Name: "access_token",
+	//	//			In:   "query",
+	//	//		},
+	//	//	},
+	//	//	"/api/login2",
+	//	//},
+	//})
 
 	println("服务启动于 ", "127.0.0.1:8080")
 	//使用标准库启动http
