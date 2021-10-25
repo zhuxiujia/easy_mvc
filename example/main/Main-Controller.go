@@ -26,7 +26,7 @@ type TestController struct {
 	Upload func(file easy_mvc.MultipartFile) interface{}                       `path:"/upload" arg:"file" doc:"文件上传"`
 	Json   func(js string) interface{}                                         `path:"/json" arg:"js" doc:"json数据,需要Header/Content-Type设置application/json"`
 
-	UserInfo  func() interface{} `path:"/api/login2"`
+	UserInfo  func() interface{} `path:"/api/login2" method:"post"`
 	UserInfo2 func() interface{} `path:"/api/login2" method:"get"`
 }
 
@@ -41,7 +41,10 @@ func (it *TestController) New() {
 		return fmt.Sprint("do Login phone string, pwd string, age *int :", phone, ",", pwd, ",", ageStr)
 	}
 	it.UserInfo = func() interface{} {
-		return TestUserVO{}
+		return TestUserVO{Name: "UserInfo"}
+	}
+	it.UserInfo2 = func() interface{} {
+		return TestUserVO{Name: "UserInfo2"}
 	}
 	it.Login2 = func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("fuck"))

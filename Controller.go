@@ -121,7 +121,6 @@ func init() {
 type Controller struct {
 }
 
-var targetPaths = map[string]func(w http.ResponseWriter, r *http.Request){}
 var pathMethods = map[string]bool{}
 
 func (it *Controller) Init(arg interface{}) {
@@ -142,6 +141,13 @@ func (it *Controller) Init(arg interface{}) {
 
 	var argType = argV.Type()
 	var rootPath = checkHaveRootPath(argType)
+
+	type Func struct {
+		Fn     *func(writer http.ResponseWriter, request *http.Request)
+		Method string
+	}
+	var handleFuncs = map[string][]Func{}
+
 	for i := 0; i < argType.NumField(); i++ {
 		var funcField = argType.Field(i)
 		var field = argV.Field(i)
@@ -281,21 +287,30 @@ func (it *Controller) Init(arg interface{}) {
 			}
 		}
 		log.Println("[easy_mvc] http.HandleFunc " + argType.String() + "  =>  " + funcField.Name + " " + funcField.Type.String() + strings.Replace(string(" "+funcField.Tag), funcField.Tag.Get("path"), tagPath, -1))
-		var oldPath = targetPaths[tagPath]
-		if oldPath == nil {
-			oldPath = func(w http.ResponseWriter, r *http.Request) {
-				httpFunc(w, r)
-			}
-		} else {
-			oldPath = func(w http.ResponseWriter, r *http.Request) {
-				oldPath(w, r)
-				httpFunc(w, r)
-			}
+		var fns = handleFuncs[tagPath]
+		if fns == nil {
+			fns = []Func{}
 		}
-		targetPaths[tagPath] = oldPath
+		fns = append(fns, Func{
+			Method: method,
+			Fn:     &httpFunc,
+		})
+		handleFuncs[tagPath] = fns
 	}
-	for path, _ := range targetPaths {
-		http.HandleFunc(path, targetPaths[path])
+	for path, fns := range handleFuncs {
+		http.HandleFunc(path, func(writer http.ResponseWriter, request *http.Request) {
+			for _, f := range fns {
+				if f.Method == "" {
+					(*f.Fn)(writer, request)
+					return
+				} else {
+					if request.Method == f.Method || strings.ToLower(request.Method) == strings.ToLower(f.Method) {
+						(*f.Fn)(writer, request)
+						return
+					}
+				}
+			}
+		})
 	}
 	//存入上下文
 	ControllerTable.Store(argType.Name(), arg)
